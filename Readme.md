@@ -1,7 +1,7 @@
 # Проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
-* Студент: [Анна Макаричак](https://up.htmlacademy.ru/ecmascript/13/user/470691).
-* Наставник: `Неизвестно`.
+- Студент: [Анна Макаричак](https://up.htmlacademy.ru/ecmascript/13/user/470691).
+- Наставник: [Даниил Царёв](https://htmlacademy.ru/profile/id945835).
 
 ---
 
