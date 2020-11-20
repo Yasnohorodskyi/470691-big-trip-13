@@ -7,7 +7,7 @@ import {createFormEditTemplate} from "./view/form-edit.js";
 import {createFormAddTemplate} from "./view/form-create.js";
 import {createTripPriceTemplate} from "./view/trip-price.js";
 
-const render = (container, template, place) => {
+const render = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
 };
 
@@ -15,17 +15,17 @@ const mainTripElement = document.querySelector(`.trip-main`);
 render(mainTripElement, createTripInfoTemplate(), `afterbegin`);
 
 const tripInfoElement = document.querySelector(`.trip-info`);
-render(tripInfoElement, createTripPriceTemplate(), `beforeend`);
+render(tripInfoElement, createTripPriceTemplate());
 
 const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
-render(tripControlsElement, createMainMenuTemplate(), `beforeend`);
-render(tripControlsElement, createTripFiltersTemplate(), `beforeend`);
+render(tripControlsElement, createMainMenuTemplate());
+render(tripControlsElement, createTripFiltersTemplate());
 
 const tripEventsContainer = document.querySelector(`.trip-events`);
 render(tripEventsContainer, createTripSortTemplate(), `afterbegin`);
-render(tripEventsContainer, createPointTemplate(), `beforeend`);
+render(tripEventsContainer, createPointTemplate());
 
 const tripEventsListContainer = document.querySelector(`.trip-events__list`);
 render(tripEventsListContainer, createFormEditTemplate(), `afterbegin`);
-render(tripEventsListContainer, createFormAddTemplate(), `beforeend`);
+render(tripEventsListContainer, createFormAddTemplate());
 
