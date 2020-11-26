@@ -75,8 +75,8 @@ const generateDestinationInfo = () => {
 };
 
 const generateEvent = () => {
-  const startDate = dayjs().format();
-  const endDate = dayjs().add(getRandomInteger(1, 200), `hour`).format();
+  const startDate = dayjs().add(getRandomInteger(-7, 7), `day`).format();
+  const endDate = dayjs(startDate).add(getRandomInteger(1, 200), `hour`).format();
 
   return {
     type: generateEventType(),

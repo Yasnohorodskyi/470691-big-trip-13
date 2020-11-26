@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 import {createTripInfoTemplate} from "./view/trip-info.js";
 import {createMainMenuTemplate} from "./view/menu.js";
 import {createTripFiltersTemplate} from "./view/trip-filters.js";
@@ -8,8 +10,6 @@ import {createTripPriceTemplate} from "./view/trip-price.js";
 import {createEventTemplate} from "./view/event";
 
 import {generateEventList} from "./mock/event";
-
-const events = generateEventList();
 
 const render = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
@@ -31,7 +31,28 @@ render(tripEventsContainer, createListTemplate());
 
 const tripEventsListContainer = document.querySelector(`.trip-events__list`);
 
-render(tripEventsListContainer, createEventTemplate(events[0]), `afterbegin`);
-render(tripEventsListContainer, createEventFormTemplate(events[0]), `afterbegin`);
-render(tripEventsListContainer, createEventFormTemplate());
+// render event list from mocked data
+
+const events = generateEventList();
+events.sort((a, b) => {
+  if (dayjs(a.startDate).isBefore(b.startDate)) {
+    return -1;
+  }
+
+  if (dayjs(a.startDate).isAfter(b.startDate)) {
+    return 1;
+  }
+
+  return 0;
+});
+
+events.forEach((event, index) => {
+  if (index === 0) {
+    render(tripEventsListContainer, createEventFormTemplate(event));
+  } else {
+    render(tripEventsListContainer, createEventTemplate(event));
+  }
+});
+
+// render(tripEventsListContainer, createEventFormTemplate(events[0])); // event creation form
 
