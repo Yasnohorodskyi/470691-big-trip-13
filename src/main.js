@@ -13,7 +13,6 @@ import {generateEventList} from "./mock/event";
 
 import {renderElement, RenderPosition} from "./utils/utils";
 
-
 const mainTripElement = document.querySelector(`.trip-main`);
 renderElement(mainTripElement, new TripInfoView().getElement(), RenderPosition.AFTERBEGIN);
 
@@ -45,11 +44,32 @@ events.sort((a, b) => {
   return 0;
 });
 
-events.forEach((event, index) => {
-  if (index === 0) {
-    renderElement(tripEventsListContainer, new EventFormView(event).getElement(), RenderPosition.BEFOREEND);
-  } else {
-    renderElement(tripEventsListContainer, new EventView(event).getElement(), RenderPosition.BEFOREEND);
-  }
+const renderEvent = (eventsListContainer, event) => {
+  const eventComponent = new EventView(event);
+  const eventFormComponent = new EventFormView(event);
+
+  const replaceEventToForm = () => {
+    eventsListContainer.replaceChild(eventFormComponent.getElement(), eventComponent.getElement());
+  };
+
+  const replaceFormToEvent = () => {
+    eventsListContainer.replaceChild(eventComponent.getElement(), eventFormComponent.getElement());
+  };
+
+  eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    replaceEventToForm();
+  });
+
+  eventFormComponent.getElement().addEventListener(`submit`, (evt) => {
+    evt.preventDefault();
+    replaceFormToEvent();
+  });
+
+  renderElement(eventsListContainer, eventComponent.getElement(), RenderPosition.BEFOREEND);
+};
+
+events.forEach((event) => {
+  renderEvent(tripEventsListContainer, event);
 });
+
 
