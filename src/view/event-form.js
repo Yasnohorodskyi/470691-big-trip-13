@@ -1,7 +1,9 @@
 import dayjs from "dayjs";
 import {EVENT_TYPES} from "../constants/event-types";
 
-export const createEventFormTemplate = (event = {}) => {
+import {createElement} from "../utils/utils";
+
+const createEventFormTemplate = (event = {}) => {
   const {type = EVENT_TYPES[0], destinationName = ``, price = ``, offers = [], destinationInfo, startDate, endDate} = event;
 
   const DATE_FORMAT = `DD/MM/YY HH:MM`;
@@ -27,8 +29,8 @@ export const createEventFormTemplate = (event = {}) => {
   `)).join(``);
 
 
-  return (`
-    <li class="trip-events__item">
+  return (
+    `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
@@ -87,37 +89,37 @@ export const createEventFormTemplate = (event = {}) => {
           ${createDestinationTemplate(destinationInfo)}
         </section>
       </form>
-    </li>
-  `);
+    </li>`
+  );
 };
 
 const createDestinationTemplate = (destinationInfo) => {
   if (!destinationInfo) {
-    return (``);
+    return ``;
   }
 
-  return (`
-    <section class="event__section  event__section--destination">
+  return (
+    `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
       <p class="event__destination-description">${destinationInfo.description}</p>
     ${createPhotosTemplate(destinationInfo.photos)}
-    </section>
-  `);
+    </section>`
+  );
 };
 
 const createOffersTemplate = (offers) => {
   if (offers.length === 0) {
-    return (``);
+    return ``;
   }
 
-  return (`
-    <section class="event__section  event__section--offers">
+  return (
+    `<section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
         ${offers}
       </div>
-    </section>
-  `);
+    </section>`
+  );
 };
 
 
@@ -130,11 +132,35 @@ const createPhotosTemplate = (photos) => {
     <img class="event__photo" src="${photo}" alt="Event photo">
   `)).join(``);
 
-  return (`
-    <div class="event__photos-container">
+  return (
+    `<div class="event__photos-container">
       <div class="event__photos-tape">
         ${photosFragment}
       </div>
-    </div>
-  `);
+    </div>`
+  );
 };
+
+export default class EventForm {
+  constructor(event) {
+    this._element = null;
+
+    this._event = event;
+  }
+
+  getTemplate() {
+    return createEventFormTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

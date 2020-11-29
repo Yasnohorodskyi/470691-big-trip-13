@@ -1,8 +1,9 @@
 import dayjs from "dayjs";
 
 import {formatDuration} from "../utils/date";
+import {createElement} from "../utils/utils";
 
-export const createEventTemplate = (event) => {
+const createEventTemplate = (event) => {
   const {type, destinationName, price, offers, isFavorite, startDate, endDate} = event;
 
   const startDateFullFormatted = dayjs(startDate).format(`YYYY-MM-DD`);
@@ -20,8 +21,8 @@ export const createEventTemplate = (event) => {
     </li>
   `)).join(``);
 
-  return (`
-    <li class="trip-events__item">
+  return (
+    `<li class="trip-events__item">
       <div class="event">
         <time class="event__date" datetime="${startDateFullFormatted}">${startDateShortFormatted}</time>
         <div class="event__type">
@@ -51,6 +52,30 @@ export const createEventTemplate = (event) => {
           <span class="visually-hidden">Open event</span>
         </button>
       </div>
-    </li>
-  `);
+    </li>`
+  );
 };
+
+export default class Event {
+  constructor(event) {
+    this._element = null;
+
+    this._event = event;
+  }
+
+  getTemplate() {
+    return createEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
