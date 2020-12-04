@@ -1,3 +1,5 @@
+export const ESC_BUTTON_CODE = `Escape`;
+
 export const RenderPosition = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`
