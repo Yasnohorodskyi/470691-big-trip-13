@@ -8,10 +8,12 @@ import TripInfoView from "./view/trip-info";
 import TripPriceView from "./view/trip-price";
 import EventFormView from "./view/event-form";
 import EventView from "./view/event";
+import EmptyListView from "./view/list-empty";
 
 import {generateEventList} from "./mock/event";
 
-import {renderElement, RenderPosition} from "./utils/utils";
+import {ESC_BUTTON_CODE, renderElement, RenderPosition} from "./utils/utils";
+
 
 const mainTripElement = document.querySelector(`.trip-main`);
 renderElement(mainTripElement, new TripInfoView().getElement(), RenderPosition.AFTERBEGIN);
@@ -69,11 +71,20 @@ const renderEvent = (eventsListContainer, event) => {
     replaceFormToEvent();
   });
 
+  window.addEventListener(`keydown`, (evt) => {
+    if (evt.key === ESC_BUTTON_CODE) {
+      replaceFormToEvent();
+    }
+  });
+
   renderElement(eventsListContainer, eventComponent.getElement(), RenderPosition.BEFOREEND);
 };
 
-events.forEach((event) => {
-  renderEvent(tripEventsListContainer, event);
-});
-
+if (events.length === 0) {
+  renderElement(tripEventsListContainer, new EmptyListView().getElement(), RenderPosition.AFTERBEGIN);
+} else {
+  events.forEach((event) => {
+    renderEvent(tripEventsListContainer, event);
+  });
+}
 
