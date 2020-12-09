@@ -58,23 +58,28 @@ const renderEvent = (eventsListContainer, event) => {
     eventsListContainer.replaceChild(eventComponent.getElement(), eventFormComponent.getElement());
   };
 
-  eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
-    replaceEventToForm();
-  });
-
-  eventFormComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
-    replaceFormToEvent();
-  });
-
-  eventFormComponent.getElement().addEventListener(`submit`, (evt) => {
-    evt.preventDefault();
-    replaceFormToEvent();
-  });
-
-  window.addEventListener(`keydown`, (evt) => {
-    if (evt.key === ESC_BUTTON_CODE) {
+  const onEscKeyDown = (evt) => {
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      evt.preventDefault();
       replaceFormToEvent();
+      document.removeEventListener(`keydown`, onEscKeyDown);
     }
+  };
+
+  eventComponent.setEditClickHandler(() => {
+    replaceEventToForm();
+
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
+
+  eventFormComponent.setCloseFormHandler(() => {
+    replaceFormToEvent();
+
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
+
+  eventFormComponent.setFormSubmitHandler(() => {
+    replaceFormToEvent();
   });
 
   renderElement(eventsListContainer, eventComponent.getElement(), RenderPosition.BEFOREEND);

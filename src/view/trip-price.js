@@ -1,4 +1,4 @@
-import {createElement} from "../utils/utils";
+import AbstractView from "./abstract";
 
 const createTripPriceTemplate = () => {
   return (
@@ -8,24 +8,9 @@ const createTripPriceTemplate = () => {
   );
 };
 
-export default class TripPrice {
-  constructor() {
-    this._element = null;
-  }
+export default class TripPrice extends AbstractView {
 
   getTemplate() {
     return createTripPriceTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
