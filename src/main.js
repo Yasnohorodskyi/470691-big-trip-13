@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 
 import SiteMenuView from "./view/menu";
 import TripSortView from "./view/trip-sort";
-import TaskListView from "./view/list.js";
+import EventListView from "./view/list.js";
 import TripFiltersView from "./view/trip-filters";
 import TripInfoView from "./view/trip-info";
 import TripPriceView from "./view/trip-price";
@@ -15,26 +15,31 @@ import {generateEventList} from "./mock/event";
 import {render, RenderPosition, replace} from "./utils/render";
 import {ESC_BUTTON_CODE} from "./constants/button-codes";
 
+import TripPresenter from "./presenter/trip";
+
 
 const mainTripElement = document.querySelector(`.trip-main`);
-render(mainTripElement, new TripInfoView(), RenderPosition.AFTERBEGIN);
+// render(mainTripElement, new TripInfoView(), RenderPosition.AFTERBEGIN);
 
-const tripInfoElement = document.querySelector(`.trip-info`);
-render(tripInfoElement, new TripPriceView(), RenderPosition.BEFOREEND);
+// const tripInfoElement = document.querySelector(`.trip-info`);
+// render(tripInfoElement, new TripPriceView(), RenderPosition.BEFOREEND);
 
 const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
-render(tripControlsElement, new SiteMenuView(), RenderPosition.BEFOREEND);
-render(tripControlsElement, new TripFiltersView(), RenderPosition.BEFOREEND);
+// render(tripControlsElement, new SiteMenuView(), RenderPosition.BEFOREEND);
+// render(tripControlsElement, new TripFiltersView(), RenderPosition.BEFOREEND);
 
 const tripEventsContainer = document.querySelector(`.trip-events`);
-render(tripEventsContainer, new TripSortView(), RenderPosition.AFTERBEGIN);
-render(tripEventsContainer, new TaskListView(), RenderPosition.BEFOREEND);
-
+// render(tripEventsContainer, new TripSortView(), RenderPosition.AFTERBEGIN);
+// render(tripEventsContainer, new EventListView(), RenderPosition.BEFOREEND);
+const events = generateEventList();
 const tripEventsListContainer = document.querySelector(`.trip-events__list`);
 
+const tripPresenter = new TripPresenter(mainTripElement, tripControlsElement, tripEventsContainer);
+
+tripPresenter.init(events);
 // render event list from mocked data
 
-const events = generateEventList();
+
 events.sort((a, b) => {
   if (dayjs(a.startDate).isBefore(b.startDate)) {
     return -1;
@@ -47,50 +52,52 @@ events.sort((a, b) => {
   return 0;
 });
 
-const renderEvent = (eventsListContainer, event) => {
-  const eventComponent = new EventView(event);
-  const eventFormComponent = new EventFormView(event);
+// const renderEvent = (eventsListContainer, event) => {
+//   const eventComponent = new EventView(event);
+//   const eventFormComponent = new EventFormView(event);
 
-  const replaceEventToForm = () => {
-    replace(eventsListContainer, eventFormComponent, eventComponent);
-  };
+//   const replaceEventToForm = () => {
+//     replace(eventsListContainer, eventFormComponent, eventComponent);
+//   };
 
-  const replaceFormToEvent = () => {
-    replace(eventsListContainer, eventComponent, eventFormComponent);
-  };
+//   const replaceFormToEvent = () => {
+//     replace(eventsListContainer, eventComponent, eventFormComponent);
+//   };
 
-  const onEscKeyDown = (evt) => {
-    if (evt.key === ESC_BUTTON_CODE) {
-      evt.preventDefault();
-      replaceFormToEvent();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    }
-  };
+//   const onEscKeyDown = (evt) => {
+//     if (evt.key === ESC_BUTTON_CODE) {
+//       evt.preventDefault();
+//       replaceFormToEvent();
+//       document.removeEventListener(`keydown`, onEscKeyDown);
+//     }
+//   };
 
-  eventComponent.setEditClickHandler(() => {
-    replaceEventToForm();
+//   eventComponent.setEditClickHandler(() => {
+//     replaceEventToForm();
 
-    document.addEventListener(`keydown`, onEscKeyDown);
-  });
+//     document.addEventListener(`keydown`, onEscKeyDown);
+//   });
 
-  eventFormComponent.setCloseFormHandler(() => {
-    replaceFormToEvent();
+//   eventFormComponent.setCloseFormHandler(() => {
+//     replaceFormToEvent();
 
-    document.removeEventListener(`keydown`, onEscKeyDown);
-  });
+//     document.removeEventListener(`keydown`, onEscKeyDown);
+//   });
 
-  eventFormComponent.setFormSubmitHandler(() => {
-    replaceFormToEvent();
-  });
+//   eventFormComponent.setFormSubmitHandler(() => {
+//     replaceFormToEvent();
+//   });
 
-  render(eventsListContainer, eventComponent, RenderPosition.BEFOREEND);
-};
+//   render(eventsListContainer, eventComponent, RenderPosition.BEFOREEND);
+// };
 
-if (events.length === 0) {
-  render(tripEventsListContainer, new EmptyListView(), RenderPosition.AFTERBEGIN);
-} else {
-  events.forEach((event) => {
-    renderEvent(tripEventsListContainer, event);
-  });
-}
+// if (events.length === 0) {
+//   render(tripEventsListContainer, new EmptyListView(), RenderPosition.AFTERBEGIN);
+// } else {
+//   events.forEach((event) => {
+//     renderEvent(tripEventsListContainer, event);
+//   });
+// }
+
+
 
