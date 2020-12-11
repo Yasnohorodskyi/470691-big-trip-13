@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import {EVENT_TYPES} from "../constants/event-types";
 
-import {createElement} from "../utils/utils";
+import AbstractView from "./abstract";
 
 const createEventFormTemplate = (event = {}) => {
   const {type = EVENT_TYPES[0], destinationName = ``, price = ``, offers = [], destinationInfo, startDate, endDate} = event;
@@ -141,26 +141,37 @@ const createPhotosTemplate = (photos) => {
   );
 };
 
-export default class EventForm {
+export default class EventForm extends AbstractView {
   constructor(event) {
-    this._element = null;
+    super();
 
     this._event = event;
+
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._closeFormHandler = this._closeFormHandler.bind(this);
   }
 
   getTemplate() {
     return createEventFormTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
   }
 
-  removeElement() {
-    this._element = null;
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  _closeFormHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeClick();
+  }
+
+  setCloseFormHandler(callback) {
+    this._callback.closeClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeFormHandler);
   }
 }
