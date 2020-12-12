@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {EVENT_TYPES} from "../constants/event-types";
+import {EVENT_TYPES} from "../utils/event-types";
 
 import AbstractView from "./abstract";
 
@@ -155,6 +155,11 @@ export default class EventForm extends AbstractView {
     return createEventFormTemplate(this._event);
   }
 
+  _closeFormHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeClick();
+  }
+
   _formSubmitHandler(evt) {
     evt.preventDefault();
     this._callback.formSubmit();
@@ -163,11 +168,6 @@ export default class EventForm extends AbstractView {
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
-  }
-
-  _closeFormHandler(evt) {
-    evt.preventDefault();
-    this._callback.closeClick();
   }
 
   setCloseFormHandler(callback) {

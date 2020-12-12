@@ -1,44 +1,17 @@
 import dayjs from "dayjs";
 
-import SiteMenuView from "./view/menu";
-import TripSortView from "./view/trip-sort";
-import EventListView from "./view/list.js";
-import TripFiltersView from "./view/trip-filters";
-import TripInfoView from "./view/trip-info";
-import TripPriceView from "./view/trip-price";
-import EventFormView from "./view/event-form";
-import EventView from "./view/event";
-import EmptyListView from "./view/list-empty";
-
 import {generateEventList} from "./mock/event";
-
-import {render, RenderPosition, replace} from "./utils/render";
-import {ESC_BUTTON_CODE} from "./constants/button-codes";
 
 import TripPresenter from "./presenter/trip";
 
-
 const mainTripElement = document.querySelector(`.trip-main`);
-// render(mainTripElement, new TripInfoView(), RenderPosition.AFTERBEGIN);
-
-// const tripInfoElement = document.querySelector(`.trip-info`);
-// render(tripInfoElement, new TripPriceView(), RenderPosition.BEFOREEND);
-
 const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
-// render(tripControlsElement, new SiteMenuView(), RenderPosition.BEFOREEND);
-// render(tripControlsElement, new TripFiltersView(), RenderPosition.BEFOREEND);
-
 const tripEventsContainer = document.querySelector(`.trip-events`);
-// render(tripEventsContainer, new TripSortView(), RenderPosition.AFTERBEGIN);
-// render(tripEventsContainer, new EventListView(), RenderPosition.BEFOREEND);
 const events = generateEventList();
-const tripEventsListContainer = document.querySelector(`.trip-events__list`);
-
 const tripPresenter = new TripPresenter(mainTripElement, tripControlsElement, tripEventsContainer);
 
 tripPresenter.init(events);
 // render event list from mocked data
-
 
 events.sort((a, b) => {
   if (dayjs(a.startDate).isBefore(b.startDate)) {
@@ -98,6 +71,4 @@ events.sort((a, b) => {
 //     renderEvent(tripEventsListContainer, event);
 //   });
 // }
-
-
 

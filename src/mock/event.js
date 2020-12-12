@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {EVENT_TYPES} from "../constants/event-types";
+import {EVENT_TYPES} from "../utils/event-types";
 
 const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));

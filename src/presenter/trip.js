@@ -8,7 +8,7 @@ import EmptyListView from "../view/list-empty";
 import EventView from "../view/event";
 import EventFormView from "../view/event-form";
 import {render, RenderPosition, replace} from "../utils/render";
-import {ESC_BUTTON_CODE} from "../constants/button-codes";
+import {ESC_BUTTON_CODE} from "../utils/button-codes";
 
 export default class TripPresenter {
   constructor(mainTripContainer, tripControlsContainer, tripEventsContainer) {
@@ -29,10 +29,10 @@ export default class TripPresenter {
     this._events = events.slice();
 
     render(this._mainTripContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
-    render(this._tripInfoComponent.getElement(), this._tripPriceComponent, RenderPosition.BEFOREEND);
-    render(this._tripControlsContainer, this._siteMenuComponent, RenderPosition.BEFOREEND);
-    render(this._tripControlsContainer, this._tripFiltersComponent, RenderPosition.BEFOREEND);
-    render(this._tripEventsContainer, this._eventListComponent, RenderPosition.BEFOREEND);
+    render(this._tripInfoComponent.getElement(), this._tripPriceComponent);
+    render(this._tripControlsContainer, this._siteMenuComponent);
+    render(this._tripControlsContainer, this._tripFiltersComponent);
+    render(this._tripEventsContainer, this._eventListComponent);
 
     this._renderTripBoard();
   }
@@ -77,7 +77,7 @@ export default class TripPresenter {
       replaceFormToEvent();
     });
 
-    render(eventsListContainer, eventComponent, RenderPosition.BEFOREEND);
+    render(eventsListContainer, eventComponent);
   }
 
   _renderEventsList() {
