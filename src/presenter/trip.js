@@ -5,10 +5,8 @@ import TripFiltersView from "../view/trip-filters";
 import TripSortView from "../view/trip-sort";
 import EventListView from "../view/list.js";
 import EmptyListView from "../view/list-empty";
-import EventView from "../view/event";
-import EventFormView from "../view/event-form";
-import {render, RenderPosition, replace} from "../utils/render";
-import {ESC_BUTTON_CODE} from "../utils/button-codes";
+import {render, RenderPosition} from "../utils/render";
+import EventPresenter from "./event";
 
 export default class TripPresenter {
   constructor(mainTripContainer, tripControlsContainer, tripEventsContainer) {
@@ -42,42 +40,8 @@ export default class TripPresenter {
   }
 
   _renderEvent(eventsListContainer, event) {
-    const eventComponent = new EventView(event);
-    const eventFormComponent = new EventFormView(event);
-
-    const replaceEventToForm = () => {
-      replace(eventsListContainer, eventFormComponent, eventComponent);
-    };
-
-    const replaceFormToEvent = () => {
-      replace(eventsListContainer, eventComponent, eventFormComponent);
-    };
-
-    const onEscKeyDown = (evt) => {
-      if (evt.key === ESC_BUTTON_CODE) {
-        evt.preventDefault();
-        replaceFormToEvent();
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
-
-    eventComponent.setEditClickHandler(() => {
-      replaceEventToForm();
-
-      document.addEventListener(`keydown`, onEscKeyDown);
-    });
-
-    eventFormComponent.setCloseFormHandler(() => {
-      replaceFormToEvent();
-
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
-
-    eventFormComponent.setFormSubmitHandler(() => {
-      replaceFormToEvent();
-    });
-
-    render(eventsListContainer, eventComponent);
+    const eventPresenter = new EventPresenter(eventsListContainer);
+    eventPresenter.init(event);
   }
 
   _renderEventsList() {
