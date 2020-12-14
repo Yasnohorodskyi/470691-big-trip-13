@@ -174,4 +174,7 @@ export default class EventForm extends AbstractView {
     this._callback.closeClick = callback;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeFormHandler);
   }
+
 }
+
+
