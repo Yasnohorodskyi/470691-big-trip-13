@@ -3,13 +3,20 @@ import EventFormView from '../view/event-form';
 import {render, replace, remove} from "../utils/render";
 import {ESC_BUTTON_CODE} from '../utils/button-codes';
 
+const Mode = {
+  DEFAULT: `DEFAULT`,
+  EDITING: `EDITING`
+};
+
 export default class EventPresenter {
-  constructor(eventListContainer, changeData) {
+  constructor(eventListContainer, changeData, changeMode) {
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
+    this._changeMode = changeMode;
 
     this._eventComponent = null;
     this._eventFormComponent = null;
+    this._mode = Mode.DEFAULT;
 
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
     this._handleEditClick = this._handleEditClick.bind(this);
@@ -36,17 +43,16 @@ export default class EventPresenter {
       return;
     }
 
-    if (this._eventListContainer.getElement().contains(prevEventComponent.getElement())) {
+    if (this._mode === Mode.DEFAULT) {
       replace(this._eventListContainer, this._eventComponent, prevEventComponent);
     }
 
-    if (this._eventListContainer.getElement().contains(prevFormComponent.getElement())) {
+    if (this._mode === Mode.EDITING) {
       replace(this._eventListContainer, this._eventFormComponent, prevFormComponent);
     }
 
     remove(prevEventComponent);
     remove(prevFormComponent);
-
   }
 
   destroy() {
@@ -54,14 +60,23 @@ export default class EventPresenter {
     remove(this._eventFormComponent);
   }
 
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._replaceFormToEvent();
+    }
+  }
+
   _replaceEventToForm() {
     replace(this._eventListContainer, this._eventFormComponent, this._eventComponent);
     document.addEventListener(`keydown`, this._onEscKeyDown);
+    this._changeMode();
+    this._mode = Mode.EDITING;
   }
 
   _replaceFormToEvent() {
     replace(this._eventListContainer, this._eventComponent, this._eventFormComponent);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+    this._mode = Mode.DEFAULT;
   }
 
   _handleEditClick() {
@@ -72,8 +87,7 @@ export default class EventPresenter {
     this._replaceFormToEvent();
   }
 
-  _handleFormSubmit(event) {
-    this._changeData(event);
+  _handleFormSubmit() {
     this._replaceFormToEvent();
   }
 
