@@ -8,6 +8,8 @@ import EmptyListView from "../view/list-empty";
 import {render, RenderPosition} from "../utils/render";
 import EventPresenter from "./event";
 import {updateItem} from "../utils/common";
+import {sortByDate, sortByDuration, sortByPrice} from "../utils/sort";
+import {SortType} from "../utils/sort-type";
 
 export default class TripPresenter {
   constructor(mainTripContainer, tripControlsContainer, tripEventsContainer) {
@@ -15,6 +17,7 @@ export default class TripPresenter {
     this._tripControlsContainer = tripControlsContainer;
     this._tripEventsContainer = tripEventsContainer;
     this._eventPresenter = {};
+    this._currentSortType = SortType.DAY;
 
     this._tripInfoComponent = new TripInfoView();
     this._tripPriceComponent = new TripPriceView();
@@ -26,10 +29,12 @@ export default class TripPresenter {
 
     this._handleEventChange = this._handleEventChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(events) {
     this._events = events.slice();
+    this._sourcedEvents = events.slice();
 
     render(this._mainTripContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
     render(this._tripInfoComponent.getElement(), this._tripPriceComponent);
@@ -42,6 +47,7 @@ export default class TripPresenter {
 
   _renderSort() {
     render(this._tripEventsContainer, this._tripSortComponent, RenderPosition.AFTERBEGIN);
+    this._tripSortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderEvent(eventsListContainer, event) {
@@ -85,6 +91,20 @@ export default class TripPresenter {
   _handleModeChange() {
     Object.values(this._eventPresenter).forEach((presenter) => presenter.resetView());
   }
+
+  _handleSortTypeChange(sortType) {
+    if (sortType === SortType.PRICE) {
+      this._events.sort(sortByPrice);
+    } else if (sortType === SortType.DAY) {
+      this._events.sort(sortByDate);
+    } else if (sortType === SortType.DURATION) {
+      this._events.sort(sortByDuration);
+    }
+
+    this._clearEventList();
+    this._renderEventsList();
+  }
+
 }
 
 
