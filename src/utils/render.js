@@ -5,7 +5,7 @@ export const RenderPosition = {
   BEFOREEND: `beforeend`
 };
 
-export const render = (container, child, place) => {
+export const render = (container, child, place = RenderPosition.BEFOREEND) => {
 
   if (container instanceof Abstract) {
     container = container.getElement();
@@ -32,7 +32,7 @@ export const createElement = (template) => {
   return newElement.firstChild;
 };
 
-export const replace = (container, oldChild, newChild) => {
+export const replace = (container, newChild, oldChild) => {
 
   if (container instanceof Abstract) {
     container = container.getElement();
@@ -46,5 +46,11 @@ export const replace = (container, oldChild, newChild) => {
     newChild = newChild.getElement();
   }
 
-  container.replaceChild(oldChild, newChild);
+  container.replaceChild(newChild, oldChild);
+};
+
+export const remove = (component) => {
+  if (!(component instanceof Abstract)) {
+    throw new Error(`Can remove only components`);
+  }
 };
