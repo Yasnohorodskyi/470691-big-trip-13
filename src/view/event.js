@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-import {formatDuration} from "../utils/date";
+import {formatDuration, getDuration} from "../utils/date";
 import AbstractView from "./abstract";
 
 const createEventTemplate = (event) => {
@@ -11,7 +11,7 @@ const createEventTemplate = (event) => {
   const startTime = dayjs(startDate).format(`HH:MM`);
   const endTime = dayjs(endDate).format(`HH:MM`);
 
-  const duration = dayjs(endDate).diff(startDate);
+  const duration = getDuration(startDate, endDate);
 
   const offersFragment = offers.filter((offer) => offer.isSelected).map((offer) => (`
     <li class="event__offer">

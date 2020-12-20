@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export const formatDuration = (milliseconds) => {
   const MS_IN_SECOND = 1000;
   const SECONDS_IN_MINUTE = 60;
@@ -22,3 +24,4 @@ export const formatDuration = (milliseconds) => {
   return `${fullDays}D ${fullHours}H ${fullMinutes}M`;
 };
 
+export const getDuration = (startDate, endDate) => dayjs(endDate).diff(startDate);
