@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import {EVENT_TYPES} from "../utils/event-types";
 
-import AbstractView from "./abstract";
+import Smart from "./smart";
 
 const DATE_FORMAT = `DD/MM/YY HH:mm`;
 
@@ -142,10 +142,9 @@ const createPhotosTemplate = (photos) => {
   );
 };
 
-export default class EventForm extends AbstractView {
+export default class EventForm extends Smart {
   constructor(event) {
     super();
-
     this._event = event;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
@@ -157,31 +156,6 @@ export default class EventForm extends AbstractView {
 
   getTemplate() {
     return createEventFormTemplate(this._event);
-  }
-
-  updateData(update, justDataUpdating = true) {
-    if (!update) {
-      return;
-    }
-
-    this._event = Object.assign({}, this._event, update);
-
-    if (justDataUpdating) {
-      return;
-    }
-
-    this.updateElement();
-  }
-
-  updateElement() {
-    let prevElement = this.getElement();
-    const parent = prevElement.parentElement;
-    this.removeElement();
-
-    const newElement = this.getElement();
-    parent.replaceChild(newElement, prevElement);
-
-    this.restoreHandlers();
   }
 
   _closeFormHandler(evt) {
@@ -226,6 +200,7 @@ export default class EventForm extends AbstractView {
   restoreHandlers() {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setCloseFormHandler(this._callback.closeClick);
   }
 
   setFormSubmitHandler(callback) {
