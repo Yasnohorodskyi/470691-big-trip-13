@@ -87,7 +87,8 @@ export default class EventPresenter {
     this._replaceFormToEvent();
   }
 
-  _handleFormSubmit() {
+  _handleFormSubmit(newData) {
+    this._changeData(newData);
     this._replaceFormToEvent();
   }
 
