@@ -1,12 +1,13 @@
 import dayjs from "dayjs";
 import {EVENT_TYPES} from "../utils/event-types";
 
-import AbstractView from "./abstract";
+import Smart from "./smart";
+
+const DATE_FORMAT = `DD/MM/YY HH:mm`;
 
 const createEventFormTemplate = (event = {}) => {
   const {type = EVENT_TYPES[0], destinationName = ``, price = ``, offers = [], destinationInfo, startDate, endDate} = event;
 
-  const DATE_FORMAT = `DD/MM/YY HH:MM`;
   const startDateFormatted = dayjs(startDate).format(DATE_FORMAT);
   const endDateFormatted = dayjs(endDate).format(DATE_FORMAT);
 
@@ -141,14 +142,16 @@ const createPhotosTemplate = (photos) => {
   );
 };
 
-export default class EventForm extends AbstractView {
+export default class EventForm extends Smart {
   constructor(event) {
     super();
-
     this._event = event;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._closeFormHandler = this._closeFormHandler.bind(this);
+    this._eventTypeHandler = this._eventTypeHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
@@ -162,7 +165,42 @@ export default class EventForm extends AbstractView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    const startDateUnformatted = this.getElement().querySelector(`[name="event-start-time"]`).value;
+    const startDate = dayjs(startDateUnformatted, DATE_FORMAT).format();
+    const endDateUnformatted = this.getElement().querySelector(`[name="event-end-time"]`).value;
+    const endDate = dayjs(endDateUnformatted, DATE_FORMAT).format();
+    const offers = this._event.offers.map((offer) => {
+      const offerIsSelected = this.getElement().querySelector(`[name="event-offer-${offer.type}"]`).checked;
+      return Object.assign({}, offer, {isSelected: offerIsSelected});
+    });
+
+    this.updateData({
+      price: +this.getElement().querySelector(`.event__input--price`).value,
+      destinationName: this.getElement().querySelector(`.event__input--destination`).value,
+      startDate,
+      endDate,
+      offers,
+    });
+
+    this._callback.formSubmit(this._event);
+  }
+
+  _setInnerHandlers() {
+    this.getElement().querySelectorAll(`[name="event-type"]`).forEach((typeButtonElement) => {
+      typeButtonElement.addEventListener(`change`, this._eventTypeHandler);
+    });
+  }
+
+  _eventTypeHandler(evt) {
+    this.updateData({
+      type: evt.target.value,
+    }, false);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setCloseFormHandler(this._callback.closeClick);
   }
 
   setFormSubmitHandler(callback) {
@@ -174,7 +212,4 @@ export default class EventForm extends AbstractView {
     this._callback.closeClick = callback;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeFormHandler);
   }
-
 }
-
-

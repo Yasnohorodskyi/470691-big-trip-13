@@ -3,13 +3,15 @@ import dayjs from "dayjs";
 import {formatDuration, getDuration} from "../utils/date";
 import AbstractView from "./abstract";
 
+const TIME_FORMAT = `HH:mm`;
+
 const createEventTemplate = (event) => {
   const {type, destinationName, price, offers, isFavorite, startDate, endDate} = event;
 
   const startDateFullFormatted = dayjs(startDate).format(`YYYY-MM-DD`);
   const startDateShortFormatted = dayjs(startDate).format(`MMM D`);
-  const startTime = dayjs(startDate).format(`HH:MM`);
-  const endTime = dayjs(endDate).format(`HH:MM`);
+  const startTime = dayjs(startDate).format(TIME_FORMAT);
+  const endTime = dayjs(endDate).format(TIME_FORMAT);
 
   const duration = getDuration(startDate, endDate);
 
