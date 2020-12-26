@@ -62,7 +62,7 @@ export default class EventPresenter {
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
-      this._eventFormComponent.reset();
+      this._eventFormComponent.reset(this._event);
       this._replaceFormToEvent();
     }
   }
@@ -85,7 +85,7 @@ export default class EventPresenter {
   }
 
   _handleCloseForm() {
-    this._eventFormComponent.reset();
+    this._eventFormComponent.reset(this._event);
     this._replaceFormToEvent();
   }
 
@@ -97,7 +97,7 @@ export default class EventPresenter {
   _onEscKeyDown(evt) {
     if (evt.key === ESC_BUTTON_CODE) {
       evt.preventDefault();
-      this._eventFormComponent.reset();
+      this._eventFormComponent.reset(this._event);
       this._replaceFormToEvent();
     }
   }
