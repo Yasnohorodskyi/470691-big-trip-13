@@ -197,6 +197,10 @@ export default class EventForm extends Smart {
     }, false);
   }
 
+  reset() {
+    this.getElement().querySelector(`.event--edit`).reset();
+  }
+
   restoreHandlers() {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
