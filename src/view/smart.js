@@ -4,7 +4,7 @@ export default class Smart extends Abstract {
   constructor() {
     super();
 
-    this._event = {};
+    this._data = {};
   }
 
   updateData(update, justDataUpdating = true) {
@@ -12,7 +12,7 @@ export default class Smart extends Abstract {
       return;
     }
 
-    this._event = Object.assign({}, this._event, update);
+    this._data = Object.assign({}, this._data, update);
 
     if (justDataUpdating) {
       return;
