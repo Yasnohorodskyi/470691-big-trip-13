@@ -12,10 +12,11 @@ import {sortByDate, sortByDuration, sortByPrice} from "../utils/sort";
 import {SortType} from "../utils/sort-type";
 
 export default class TripPresenter {
-  constructor(mainTripContainer, tripControlsContainer, tripEventsContainer) {
+  constructor(mainTripContainer, tripControlsContainer, tripEventsContainer, eventsModel) {
     this._mainTripContainer = mainTripContainer;
     this._tripControlsContainer = tripControlsContainer;
     this._tripEventsContainer = tripEventsContainer;
+    this._eventsModel = eventsModel;
     this._eventPresenter = {};
     this._currentSortType = SortType.DAY;
 
@@ -81,6 +82,10 @@ export default class TripPresenter {
       .values(this._eventPresenter)
       .forEach((presenter) => presenter.destroy());
     this._eventPresenter = {};
+  }
+
+  _getEvents() {
+    return this._eventsModel.getEvents();
   }
 
   _handleEventChange(updatedEvent) {
