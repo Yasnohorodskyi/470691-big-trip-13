@@ -2,6 +2,8 @@ import EventView from '../view/event';
 import EventFormView from '../view/event-form';
 import {render, replace, remove} from "../utils/render";
 import {ESC_BUTTON_CODE} from '../utils/button-codes';
+import {UserAction} from "../utils/user-action";
+import {UpdateType} from "../utils/update-type";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -90,7 +92,7 @@ export default class EventPresenter {
   }
 
   _handleFormSubmit(newData) {
-    this._changeData(newData);
+    this._changeData(UserAction.UPDATE_EVENT, UpdateType.MINOR, newData);
     this._replaceFormToEvent();
   }
 
@@ -104,6 +106,6 @@ export default class EventPresenter {
 
   _handleFavoriteClick() {
     const newData = Object.assign({}, this._event, {isFavorite: !this._event.isFavorite});
-    this._changeData(newData);
+    this._changeData(UserAction.UPDATE_EVENT, UpdateType.MINOR, newData);
   }
 }
