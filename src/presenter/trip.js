@@ -53,7 +53,6 @@ export default class TripPresenter {
       this._tripSortComponent = null;
     }
 
-    console.log(this._currentSortType);
     this._tripSortComponent = new TripSortView(this._currentSortType);
     this._tripSortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
 
@@ -78,7 +77,7 @@ export default class TripPresenter {
 
   _renderTripBoard() {
     const events = this._getEvents();
-    console.log(events)
+    // console.log(events)
     const eventCount = events.length;
 
     if (eventCount === 0) {
@@ -88,13 +87,6 @@ export default class TripPresenter {
 
     this._renderSort();
     this._renderEventsList();
-  }
-
-  _clearEventList() {
-    Object
-      .values(this._eventPresenter)
-      .forEach((presenter) => presenter.destroy());
-    this._eventPresenter = {};
   }
 
   _getEvents() {
@@ -136,7 +128,6 @@ export default class TripPresenter {
   }
 
   _handleModelEvent(updateType, data) {
-    console.log({updateType});
     switch (updateType) {
       case UpdateType.PATCH:
         this._eventPresenter[data.id].init(data);

@@ -25,3 +25,7 @@ export const formatDuration = (milliseconds) => {
 };
 
 export const getDuration = (startDate, endDate) => dayjs(endDate).diff(startDate);
+
+export const isDatesEqual = (dateA, dateB) => {
+  return (dateA === null && dateB === null) ? true : dayjs(dateA).isSame(dateB);
+};

@@ -150,6 +150,7 @@ export default class EventForm extends Smart {
     this._startDatePicker = null;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._closeFormHandler = this._closeFormHandler.bind(this);
     this._eventTypeHandler = this._eventTypeHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
@@ -162,6 +163,17 @@ export default class EventForm extends Smart {
 
   getTemplate() {
     return createEventFormTemplate(this._data);
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._startDatePicker && this._endDatePicker) {
+      this._startDatePicker.destroy();
+      this._endDatePicker.destroy();
+      this._startDatePicker = null;
+      this._endDatePicker = null;
+    }
   }
 
   _closeFormHandler(evt) {
@@ -257,6 +269,11 @@ export default class EventForm extends Smart {
     }, false);
   }
 
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(EventForm.parseDataToEvent(this._data));
+  }
+
   reset(event) {
     this.updateData(EventForm.parseEventToData(event), false);
   }
@@ -267,6 +284,7 @@ export default class EventForm extends Smart {
     this._setEndDatePicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setCloseFormHandler(this._callback.closeClick);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   setFormSubmitHandler(callback) {
@@ -277,6 +295,11 @@ export default class EventForm extends Smart {
   setCloseFormHandler(callback) {
     this._callback.closeClick = callback;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeFormHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
   static parseEventToData(event) {
