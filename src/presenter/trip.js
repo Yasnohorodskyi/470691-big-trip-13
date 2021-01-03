@@ -5,7 +5,7 @@ import TripFiltersView from "../view/trip-filters";
 import TripSortView from "../view/trip-sort";
 import EventListView from "../view/list.js";
 import EmptyListView from "../view/list-empty";
-import {render, RenderPosition} from "../utils/render";
+import {remove, render, RenderPosition} from "../utils/render";
 import EventPresenter from "./event";
 import {sortByDate, sortByDuration, sortByPrice} from "../utils/sort";
 import {SortType} from "../utils/sort-type";
@@ -21,11 +21,12 @@ export default class TripPresenter {
     this._eventPresenter = {};
     this._currentSortType = SortType.DAY;
 
+    this._tripSortComponent = null;
+
     this._tripInfoComponent = new TripInfoView();
     this._tripPriceComponent = new TripPriceView();
     this._siteMenuComponent = new SiteMenuView();
     this._tripFiltersComponent = new TripFiltersView();
-    this._tripSortComponent = new TripSortView();
     this._eventListComponent = new EventListView();
     this._emptyListComponent = new EmptyListView();
 
@@ -48,8 +49,15 @@ export default class TripPresenter {
   }
 
   _renderSort() {
-    render(this._tripEventsContainer, this._tripSortComponent, RenderPosition.AFTERBEGIN);
+    if (this._tripSortComponent !== null) {
+      this._tripSortComponent = null;
+    }
+
+    console.log(this._currentSortType);
+    this._tripSortComponent = new TripSortView(this._currentSortType);
     this._tripSortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+
+    render(this._tripEventsContainer, this._tripSortComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderEvent(eventsListContainer, event) {
@@ -58,8 +66,8 @@ export default class TripPresenter {
     this._eventPresenter[event.id] = eventPresenter;
   }
 
-  _renderEventsList(events) {
-    events.forEach((event) => {
+  _renderEventsList() {
+    this._getEvents().forEach((event) => {
       this._renderEvent(this._eventListComponent, event);
     });
   }
@@ -69,13 +77,17 @@ export default class TripPresenter {
   }
 
   _renderTripBoard() {
-    if (this._getEvents().length === 0) {
+    const events = this._getEvents();
+    console.log(events)
+    const eventCount = events.length;
+
+    if (eventCount === 0) {
       this._renderNoEvents();
-    } else {
-      this._renderEventsList(this._getEvents());
+      return;
     }
 
     this._renderSort();
+    this._renderEventsList();
   }
 
   _clearEventList() {
@@ -97,8 +109,19 @@ export default class TripPresenter {
     return this._eventsModel.getEvents();
   }
 
+  _clearTripBoard({resetSortType = false} = {}) {
+    Object.values(this._eventPresenter).forEach((presenter) => presenter.destroy());
+    this._eventPresenter = {};
+
+    remove(this._tripSortComponent);
+    remove(this._emptyListComponent);
+
+    if (resetSortType) {
+      this._currentSortType = SortType.DAY;
+    }
+  }
+
   _handleViewAction(actionType, updateType, update) {
-    // this._events = updateItem(this._events, updatedEvent); to call update model
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
         this._eventsModel.updateEvent(updateType, update);
@@ -110,22 +133,23 @@ export default class TripPresenter {
         this._eventsModel.deleteEvent(updateType, update);
         break;
     }
-    console.log(actionType, updateType, update);
   }
 
   _handleModelEvent(updateType, data) {
+    console.log({updateType});
     switch (updateType) {
       case UpdateType.PATCH:
         this._eventPresenter[data.id].init(data);
         break;
       case UpdateType.MINOR:
-        // update list
+        this._clearTripBoard();
+        this._renderTripBoard();
         break;
       case UpdateType.MAJOR:
-        //update board
+        this._clearTripBoard({resetSortType: true});
+        this._renderTripBoard();
         break;
     }
-    console.log(updateType, data);
   }
 
   _handleModeChange() {
@@ -138,8 +162,8 @@ export default class TripPresenter {
     }
 
     this._currentSortType = sortType;
-    this._clearEventList();
-    this._renderEventsList();
+    this._clearTripBoard();
+    this._renderTripBoard();
   }
 
 }

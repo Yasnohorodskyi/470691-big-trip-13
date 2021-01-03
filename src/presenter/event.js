@@ -78,6 +78,7 @@ export default class EventPresenter {
 
   _replaceFormToEvent() {
     replace(this._eventListContainer, this._eventComponent, this._eventFormComponent);
+
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     this._mode = Mode.DEFAULT;
   }
@@ -92,8 +93,8 @@ export default class EventPresenter {
   }
 
   _handleFormSubmit(newData) {
-    this._changeData(UserAction.UPDATE_EVENT, UpdateType.MINOR, newData);
     this._replaceFormToEvent();
+    this._changeData(UserAction.UPDATE_EVENT, UpdateType.MINOR, newData);
   }
 
   _onEscKeyDown(evt) {
