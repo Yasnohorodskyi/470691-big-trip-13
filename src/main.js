@@ -5,11 +5,14 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 
 import TripPresenter from "./presenter/trip";
 import EventsModel from "./model/events";
+import FilterModel from "./model/filter";
 import {sortByDate} from "./utils/sort";
 
 dayjs.extend(customParseFormat);
 
 const eventsModel = new EventsModel();
+
+const filterModel = new FilterModel();
 
 
 const mainTripElement = document.querySelector(`.trip-main`);
