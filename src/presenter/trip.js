@@ -10,13 +10,15 @@ import {sortByDate, sortByDuration, sortByPrice} from "../utils/sort";
 import {SortType} from "../utils/sort-type";
 import {UpdateType} from "../utils/update-type";
 import {UserAction} from "../utils/user-action";
+import {filter} from "../utils/filter";
 
 export default class TripPresenter {
-  constructor(mainTripContainer, tripControlsContainer, tripEventsContainer, eventsModel) {
+  constructor(mainTripContainer, tripControlsContainer, tripEventsContainer, eventsModel, filterModel) {
     this._mainTripContainer = mainTripContainer;
     this._tripControlsContainer = tripControlsContainer;
     this._tripEventsContainer = tripEventsContainer;
     this._eventsModel = eventsModel;
+    this._filterModel = filterModel;
     this._eventPresenter = {};
     this._currentSortType = SortType.DAY;
 
@@ -34,6 +36,7 @@ export default class TripPresenter {
     this._handleViewAction = this._handleViewAction.bind(this);
 
     this._eventsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -87,15 +90,19 @@ export default class TripPresenter {
   }
 
   _getEvents() {
+    const filterType = this._filterModel.getFilter();
+    const events = this._eventsModel.getEvents();
+    const filteredEvents = filter[filterType](events);
+
     switch (this._currentSortType) {
       case SortType.DAY:
-        return this._eventsModel.getEvents().slice().sort(sortByDate);
+        return filteredEvents.sort(sortByDate);
       case SortType.PRICE:
-        return this._eventsModel.getEvents().slice().sort(sortByPrice);
+        return filteredEvents.sort(sortByPrice);
       case SortType.DURATION:
-        return this._eventsModel.getEvents().slice().sort(sortByDuration);
+        return filteredEvents.sort(sortByDuration);
     }
-    return this._eventsModel.getEvents();
+    return filteredEvents;
   }
 
   _clearTripBoard({resetSortType = false} = {}) {

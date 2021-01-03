@@ -19,7 +19,7 @@ const mainTripElement = document.querySelector(`.trip-main`);
 const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
 const tripEventsContainer = document.querySelector(`.trip-events`);
 const events = generateEventList();
-const tripPresenter = new TripPresenter(mainTripElement, tripControlsElement, tripEventsContainer, eventsModel);
+const tripPresenter = new TripPresenter(mainTripElement, tripControlsElement, tripEventsContainer, eventsModel, filterModel);
 const filterPresenter = new FilterPresenter(tripControlsElement, filterModel);
 
 eventsModel.setEvents(events);
