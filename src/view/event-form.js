@@ -75,7 +75,7 @@ const createEventFormTemplate = (event = {}) => {
               <span class="visually-hidden">Price</span>
               €
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" min="1">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -144,8 +144,9 @@ const createPhotosTemplate = (photos) => {
 };
 
 export default class EventForm extends Smart {
-  constructor(event) {
+  constructor(event, isNew = false) {
     super();
+    this.isEventCreationForm = isNew;
     this._data = EventForm.parseEventToData(event);
     this._startDatePicker = null;
 
@@ -155,10 +156,16 @@ export default class EventForm extends Smart {
     this._eventTypeHandler = this._eventTypeHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
+    this._destinationNameChangeHandler = this._destinationNameChangeHandler.bind(this);
+    this._priceChangeHandler = this._priceChangeHandler.bind(this);
 
     this._setInnerHandlers();
     this._setStartDatePicker();
     this._setEndDatePicker();
+
+    if (this.isEventCreationForm) {
+      this._disableSaveButton(true);
+    }
   }
 
   getTemplate() {
@@ -187,18 +194,28 @@ export default class EventForm extends Smart {
     const startDate = dayjs(startDateUnformatted, DAYJS_DATE_FORMAT).format();
     const endDateUnformatted = this.getElement().querySelector(`[name="event-end-time"]`).value;
     const endDate = dayjs(endDateUnformatted, DAYJS_DATE_FORMAT).format();
-    const offers = this._data.offers.map((offer) => {
+    const offers = this._data.offers ? this._data.offers.map((offer) => {
       const offerIsSelected = this.getElement().querySelector(`[name="event-offer-${offer.type}"]`).checked;
       return Object.assign({}, offer, {isSelected: offerIsSelected});
-    });
+    }) : [];
 
-    this.updateData({
+    const newData = {
       price: +this.getElement().querySelector(`.event__input--price`).value,
       destinationName: this.getElement().querySelector(`.event__input--destination`).value,
       startDate,
       endDate,
       offers,
-    });
+    };
+
+    if (this.isEventCreationForm) {
+      newData.type = this.getElement().querySelector(`.event__type-input:checked`).value;
+
+      if (newData.price === null || undefined) {
+        this.getElement().querySelector(`.event__save-btn`).setAttribute(`disabled`);
+      }
+    }
+
+    this.updateData(newData);
 
     this._callback.formSubmit(this._data);
   }
@@ -207,6 +224,9 @@ export default class EventForm extends Smart {
     this.getElement().querySelectorAll(`[name="event-type"]`).forEach((typeButtonElement) => {
       typeButtonElement.addEventListener(`change`, this._eventTypeHandler);
     });
+
+    this.getElement().querySelector(`.event__input--destination`).addEventListener(`input`, this._destinationNameChangeHandler);
+    this.getElement().querySelector(`.event__input--price`).addEventListener(`input`, this._priceChangeHandler);
   }
 
   _setStartDatePicker() {
@@ -272,6 +292,28 @@ export default class EventForm extends Smart {
   _formDeleteClickHandler(evt) {
     evt.preventDefault();
     this._callback.deleteClick(EventForm.parseDataToEvent(this._data));
+  }
+
+  _destinationNameChangeHandler(evt) {
+    const isDestinationNameValid = evt.target.value !== ``;
+    const price = this.getElement().querySelector(`.event__input--price`).value;
+    const isPriceValid = +price > 0;
+    this._disableSaveButton(!isDestinationNameValid || !isPriceValid);
+  }
+
+  _priceChangeHandler(evt) {
+    const isPriceValid = +evt.target.value > 0;
+    const destinationName = this.getElement().querySelector(`.event__input--destination`).value;
+    const isDestinationNameValid = destinationName !== ``;
+    this._disableSaveButton(!isPriceValid || !isDestinationNameValid);
+  }
+
+  _disableSaveButton(isDisabled) {
+    if (isDisabled) {
+      this.getElement().querySelector(`.event__save-btn`).setAttribute(`disabled`, `disabled`);
+    } else {
+      this.getElement().querySelector(`.event__save-btn`).removeAttribute(`disabled`);
+    }
   }
 
   reset(event) {
