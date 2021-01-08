@@ -2,6 +2,9 @@ import EventView from '../view/event';
 import EventFormView from '../view/event-form';
 import {render, replace, remove} from "../utils/render";
 import {ESC_BUTTON_CODE} from '../utils/button-codes';
+import {UserAction} from "../utils/user-action";
+import {UpdateType} from "../utils/update-type";
+import {isDatesEqual} from '../utils/date';
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -23,6 +26,7 @@ export default class EventPresenter {
     this._handleCloseForm = this._handleCloseForm.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
   init(event) {
@@ -37,6 +41,7 @@ export default class EventPresenter {
     this._eventFormComponent.setCloseFormHandler(this._handleCloseForm);
     this._eventFormComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._eventComponent.setFavoriteClick(this._handleFavoriteClick);
+    this._eventFormComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (prevEventComponent === null || prevFormComponent === null) {
       render(this._eventListContainer, this._eventComponent);
@@ -76,6 +81,7 @@ export default class EventPresenter {
 
   _replaceFormToEvent() {
     replace(this._eventListContainer, this._eventComponent, this._eventFormComponent);
+
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     this._mode = Mode.DEFAULT;
   }
@@ -90,8 +96,18 @@ export default class EventPresenter {
   }
 
   _handleFormSubmit(newData) {
-    this._changeData(newData);
+    const isMinorUpdate =
+      !isDatesEqual(this._event.startDate, newData.startDate) ||
+      !isDatesEqual(this._event.endDate, newData.endDate) ||
+      this._event.price !== newData.price;
+
     this._replaceFormToEvent();
+
+    this._changeData(UserAction.UPDATE_EVENT, isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH, newData);
+  }
+
+  _handleDeleteClick(event) {
+    this._changeData(UserAction.DELETE_EVENT, UpdateType.MINOR, event);
   }
 
   _onEscKeyDown(evt) {
@@ -104,6 +120,6 @@ export default class EventPresenter {
 
   _handleFavoriteClick() {
     const newData = Object.assign({}, this._event, {isFavorite: !this._event.isFavorite});
-    this._changeData(newData);
+    this._changeData(UserAction.UPDATE_EVENT, UpdateType.MINOR, newData);
   }
 }
