@@ -11,7 +11,7 @@ import {SortType} from "../utils/sort-type";
 import {UpdateType} from "../utils/update-type";
 import {UserAction} from "../utils/user-action";
 import {filter} from "../utils/filter";
-import {FilterType} from "../utils/filter-type";
+import {FilterType} from "../utils/filter";
 
 export default class TripPresenter {
   constructor(mainTripContainer, tripEventsContainer, eventsModel, filterModel) {
@@ -98,7 +98,6 @@ export default class TripPresenter {
 
   _renderTripBoard() {
     const events = this._getEvents();
-    // console.log(events)
     const eventCount = events.length;
 
     if (eventCount === 0) {
@@ -117,11 +116,11 @@ export default class TripPresenter {
 
     switch (this._currentSortType) {
       case SortType.DAY:
-        return filteredEvents.sort(sortByDate);
+        return filteredEvents.slice().sort(sortByDate);
       case SortType.PRICE:
-        return filteredEvents.sort(sortByPrice);
+        return filteredEvents.slice().sort(sortByPrice);
       case SortType.DURATION:
-        return filteredEvents.sort(sortByDuration);
+        return filteredEvents.slice().sort(sortByDuration);
     }
     return filteredEvents;
   }

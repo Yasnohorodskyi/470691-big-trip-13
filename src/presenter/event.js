@@ -1,7 +1,7 @@
 import EventView from '../view/event';
 import EventFormView from '../view/event-form';
 import {render, replace, remove} from "../utils/render";
-import {ESC_BUTTON_CODE} from '../utils/button-codes';
+import {isEscPressed} from '../utils/button-codes';
 import {UserAction} from "../utils/user-action";
 import {UpdateType} from "../utils/update-type";
 import {isDatesEqual} from '../utils/date';
@@ -111,7 +111,7 @@ export default class EventPresenter {
   }
 
   _onEscKeyDown(evt) {
-    if (evt.key === ESC_BUTTON_CODE) {
+    if (isEscPressed(evt)) {
       evt.preventDefault();
       this._eventFormComponent.reset(this._event);
       this._replaceFormToEvent();

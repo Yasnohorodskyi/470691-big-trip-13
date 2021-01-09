@@ -12,7 +12,7 @@ export default class Events extends Observer {
   }
 
   getEvents() {
-    return this._events;
+    return this._events.slice();
   }
 
   updateEvent(updateType, update) {

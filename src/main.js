@@ -13,7 +13,7 @@ import {sortByDate} from "./utils/sort";
 import {render} from "./utils/render";
 import {MenuItem} from "./utils/menu-item";
 import {UpdateType} from "./utils/update-type";
-import {FilterType} from "./utils/filter-type";
+import {FilterType} from "./utils/filter";
 
 dayjs.extend(customParseFormat);
 

@@ -1,5 +1,10 @@
 import dayjs from "dayjs";
-import {FilterType} from "../utils/filter-type";
+
+export const FilterType = {
+  EVERYTHING: `EVERYTHING`,
+  FUTURE: `FUTURE`,
+  PAST: `PAST`
+};
 
 export const filter = {
   [FilterType.EVERYTHING]: (events) => events.filter((event) => event),

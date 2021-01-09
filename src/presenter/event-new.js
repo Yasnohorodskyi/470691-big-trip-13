@@ -3,6 +3,7 @@ import {generateId} from "../mock/event";
 import {remove, render, RenderPosition} from "../utils/render";
 import {UserAction} from "../utils/user-action";
 import {UpdateType} from "../utils/update-type";
+import {isEscPressed} from "../utils/button-codes";
 
 export default class EventNew {
   constructor(eventListContainer, changeData) {
@@ -51,7 +52,7 @@ export default class EventNew {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
+    if (isEscPressed(evt)) {
       evt.preventDefault();
       this.destroy();
     }
