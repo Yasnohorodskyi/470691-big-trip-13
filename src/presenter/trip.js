@@ -174,7 +174,7 @@ export default class TripPresenter {
   }
 
   _handleSortTypeChange(sortType) {
-    if (this._currentSortType === SortType) {
+    if (this._currentSortType === sortType) {
       return;
     }
 

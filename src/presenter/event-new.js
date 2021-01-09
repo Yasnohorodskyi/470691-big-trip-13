@@ -28,6 +28,7 @@ export default class EventNew {
 
     render(this._eventListContainer, this._formEditComponent, RenderPosition.AFTERBEGIN);
 
+    document.querySelector(`.trip-main__event-add-btn`).disabled = true;
     document.addEventListener(`keydown`, this._escKeyDownHandler);
   }
 
@@ -39,6 +40,7 @@ export default class EventNew {
     remove(this._formEditComponent);
     this._formEditComponent = null;
 
+    document.querySelector(`.trip-main__event-add-btn`).disabled = false;
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 

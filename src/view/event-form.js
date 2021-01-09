@@ -9,19 +9,8 @@ import Smart from "./smart";
 
 const DAYJS_DATE_FORMAT = `DD/MM/YY HH:mm`;
 
-const createEventFormTemplate = (event = {}) => {
+const createEventFormTemplate = (event = {}, isNewEvent = false) => {
   const {type = EVENT_TYPES[0], destinationName = ``, price = ``, offers = [], destinationInfo} = event;
-
-  const offersFragment = offers.map((offer) => (`
-    <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${offer.isSelected ? `checked=""` : ``}>
-      <label class="event__offer-label" for="event-offer-${offer.type}-1">
-        <span class="event__offer-title">${offer.name}</span>
-        +€&nbsp;
-        <span class="event__offer-price">${offer.price}</span>
-      </label>
-    </div>
-  `)).join(``);
 
   const typesFragment = EVENT_TYPES.map((eventType) => (`
     <div class="event__type-item">
@@ -79,17 +68,16 @@ const createEventFormTemplate = (event = {}) => {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-          <button class="event__rollup-btn" type="button">
+          <button class="event__reset-btn" type="reset">${isNewEvent ? `Cancel` : `Delete`}</button>
+          ${isNewEvent ? `` : `<button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
-          </button>
+          </button>`}
         </header>
-        <section class="event__details">
-
-          ${createOffersTemplate(offersFragment)}
+        ${offers.length > 0 || destinationInfo ? `<section class="event__details">
+          ${createOffersTemplate(offers)}
 
           ${createDestinationTemplate(destinationInfo)}
-        </section>
+        </section>` : ``}
       </form>
     </li>`
   );
@@ -114,11 +102,22 @@ const createOffersTemplate = (offers) => {
     return ``;
   }
 
+  const offersFragment = offers.map((offer) => (`
+    <div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${offer.isSelected ? `checked=""` : ``}>
+      <label class="event__offer-label" for="event-offer-${offer.type}-1">
+        <span class="event__offer-title">${offer.name}</span>
+        +€&nbsp;
+        <span class="event__offer-price">${offer.price}</span>
+      </label>
+    </div>
+  `)).join(``);
+
   return (
     `<section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-        ${offers}
+        ${offersFragment}
       </div>
     </section>`
   );
@@ -146,7 +145,7 @@ const createPhotosTemplate = (photos) => {
 export default class EventForm extends Smart {
   constructor(event, isNew = false) {
     super();
-    this.isEventCreationForm = isNew;
+    this._isEventCreationForm = isNew;
     this._data = EventForm.parseEventToData(event);
     this._startDatePicker = null;
 
@@ -163,13 +162,13 @@ export default class EventForm extends Smart {
     this._setStartDatePicker();
     this._setEndDatePicker();
 
-    if (this.isEventCreationForm) {
+    if (this._isEventCreationForm) {
       this._disableSaveButton(true);
     }
   }
 
   getTemplate() {
-    return createEventFormTemplate(this._data);
+    return createEventFormTemplate(this._data, this._isEventCreationForm);
   }
 
   removeElement() {
@@ -207,7 +206,7 @@ export default class EventForm extends Smart {
       offers,
     };
 
-    if (this.isEventCreationForm) {
+    if (this._isEventCreationForm) {
       newData.type = this.getElement().querySelector(`.event__type-input:checked`).value;
 
       if (newData.price === null || undefined) {

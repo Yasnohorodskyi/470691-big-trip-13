@@ -30,13 +30,14 @@ const pageBodyContainerElement = document.querySelector(`.page-main .page-body__
 const events = generateEventList();
 const tripPresenter = new TripPresenter(mainTripElement, tripEventsContainer, eventsModel, filterModel);
 const filterPresenter = new FilterPresenter(tripControlsElement, filterModel);
-const statisticsComponent = new StatisticsView();
 
 render(tripControlsElement, siteMenuComponent);
-render(pageBodyContainerElement, statisticsComponent);
 
 eventsModel.setEvents(events);
 events.sort(sortByDate);
+
+const statisticsComponent = new StatisticsView(eventsModel.getEvents());
+render(pageBodyContainerElement, statisticsComponent);
 
 tripPresenter.init();
 filterPresenter.init();
