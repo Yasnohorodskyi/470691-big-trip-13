@@ -1,6 +1,6 @@
 import FilterView from "../view/trip-filters";
 import {render, replace, remove} from "../utils/render";
-import {FilterType} from "../utils/filter-type";
+import {FilterType} from "../utils/filter";
 import {UpdateType} from "../utils/update-type";
 
 export default class Filter {
@@ -20,7 +20,7 @@ export default class Filter {
   init() {
     this._currentFilter = this._filterModel.getFilter();
 
-    const filters = this._getFilters();
+    const filters = Filter.getFilters();
     const prevFilterComponent = this._filterComponent;
 
     this._filterComponent = new FilterView(filters, this._currentFilter);
@@ -47,7 +47,7 @@ export default class Filter {
     this._filterModel.setFilter(UpdateType.MAJOR, filterType);
   }
 
-  _getFilters() {
+  static getFilters() {
     return [
       {
         type: FilterType.EVERYTHING,

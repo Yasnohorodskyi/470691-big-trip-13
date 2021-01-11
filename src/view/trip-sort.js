@@ -50,6 +50,13 @@ export default class TripSort extends AbstractView {
       return;
     }
 
+    const inputId = evt.target.htmlFor;
+    const input = this.getElement().querySelector(`#${inputId}`);
+
+    if (input.disabled) {
+      return;
+    }
+
     this._callback.sortTypeChange(evt.target.dataset.sortType);
   }
 
