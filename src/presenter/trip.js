@@ -6,6 +6,7 @@ import EmptyListView from "../view/list-empty";
 import {remove, render, RenderPosition} from "../utils/render";
 import EventPresenter from "./event";
 import EventNewPresenter from "./event-new";
+import LoadingView from "../view/loading";
 import {sortByDate, sortByDuration, sortByPrice} from "../utils/sort";
 import {SortType} from "../utils/sort-type";
 import {UpdateType} from "../utils/update-type";
@@ -14,13 +15,15 @@ import {filter} from "../utils/filter";
 import {FilterType} from "../utils/filter";
 
 export default class TripPresenter {
-  constructor(mainTripContainer, tripEventsContainer, eventsModel, filterModel) {
+  constructor(mainTripContainer, tripEventsContainer, eventsModel, filterModel, api) {
     this._mainTripContainer = mainTripContainer;
     this._tripEventsContainer = tripEventsContainer;
     this._eventsModel = eventsModel;
     this._filterModel = filterModel;
     this._eventPresenter = {};
     this._currentSortType = SortType.DAY;
+    this._isLoading = true;
+    this._api = api;
 
     this._tripSortComponent = null;
 
@@ -28,6 +31,7 @@ export default class TripPresenter {
     this._tripPriceComponent = new TripPriceView();
     this._eventListComponent = new EventListView();
     this._emptyListComponent = new EmptyListView();
+    this._loadingComponent = new LoadingView();
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
@@ -36,7 +40,7 @@ export default class TripPresenter {
 
     this._eventNewPresenter = new EventNewPresenter(this._eventListComponent, this._handleViewAction);
 
-    this.hide();
+
   }
 
   init() {
@@ -97,6 +101,11 @@ export default class TripPresenter {
   }
 
   _renderTripBoard() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     const events = this._getEvents();
     const eventCount = events.length;
 
@@ -138,10 +147,16 @@ export default class TripPresenter {
     }
   }
 
+  _renderLoading() {
+    render(this._tripEventsContainer, this._loadingComponent);
+  }
+
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
-        this._eventsModel.updateEvent(updateType, update);
+        this._api.updateEvent(update).then((response) => {
+          this._eventsModel.updateEvent(updateType, response);
+        });
         break;
       case UserAction.ADD_EVENT:
         this._eventsModel.addEvent(updateType, update);
@@ -163,6 +178,12 @@ export default class TripPresenter {
         break;
       case UpdateType.MAJOR:
         this._clearTripBoard({resetSortType: true});
+        this._renderTripBoard();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        this.hide();
+        remove(this._loadingComponent);
         this._renderTripBoard();
         break;
     }

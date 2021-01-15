@@ -7,8 +7,10 @@ export default class Events extends Observer {
     this._events = [];
   }
 
-  setEvents(events) {
+  setEvents(updateType, events) {
     this._events = events.slice();
+
+    this._notify(updateType);
   }
 
   getEvents() {
@@ -62,23 +64,20 @@ export default class Events extends Observer {
       };
     });
 
-    const adaptedEvent = Object.assign({}, event, {
+    const adaptedEvent = Object.assign({}, {
       id: event.id,
       type: event.type,
       destinationName: event.destination.name,
-      destinationInfo: event.destination.description,
+      destinationInfo: {
+        description: event.destination.description,
+        photos: event.destination.pictures,
+      },
       startDate: event.date_from,
       endDate: event.date_to,
       offers,
       price: event.base_price,
       isFavorite: event.is_favorite,
     });
-
-    delete adaptedEvent.destination.name;
-    delete adaptedEvent.destination.description;
-    delete adaptedEvent.date_from;
-    delete adaptedEvent.date_to;
-    delete adaptedEvent.is_favorite;
 
     return adaptedEvent;
   }
@@ -91,25 +90,20 @@ export default class Events extends Observer {
       };
     });
 
-    const adaptedEvent = Object.assign({}, event, {
-      "id": event.id,
-      "type": event.type,
-      "destination": {
-        "description": event.destinationInfo,
-        "name": event.destinationName
-      },
+    const adaptedEvent = Object.assign({}, {
+      "base_price": event.price,
       "date_from": event.startDate,
       "date_to": event.endDate,
-      offers,
-      "base_price": event.price,
+      "destination": {
+        "description": event.destinationInfo.description,
+        "name": event.destinationName,
+        "pictures": event.destinationInfo.photos,
+      },
+      "id": event.id,
       "is_favorite": event.isFavorite,
+      offers,
+      "type": event.type
     });
-
-    delete adaptedEvent.destinationInfo;
-    delete adaptedEvent.destinationName;
-    delete adaptedEvent.startDate;
-    delete adaptedEvent.endDate;
-    delete adaptedEvent.isFavorite; // TODO: check if all fields are deleted
 
     return adaptedEvent;
   }
