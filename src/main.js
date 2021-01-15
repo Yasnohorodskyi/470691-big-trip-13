@@ -14,11 +14,14 @@ import {render} from "./utils/render";
 import {MenuItem} from "./utils/menu-item";
 import {UpdateType} from "./utils/update-type";
 import {FilterType} from "./utils/filter";
+import Api from "./api";
 
 dayjs.extend(customParseFormat);
 
-const eventsModel = new EventsModel();
+const AUTHORIZATION = `Basic dkggfgfflpr0gghhb`;
+const END_POINT = `https://13.ecmascript.pages.academy/big-trip/`;
 
+const eventsModel = new EventsModel();
 const filterModel = new FilterModel();
 
 const siteMenuComponent = new SiteMenuView();
@@ -30,6 +33,7 @@ const pageBodyContainerElement = document.querySelector(`.page-main .page-body__
 const events = generateEventList();
 const tripPresenter = new TripPresenter(mainTripElement, tripEventsContainer, eventsModel, filterModel);
 const filterPresenter = new FilterPresenter(tripControlsElement, filterModel);
+const api = new Api(END_POINT, AUTHORIZATION);
 
 render(tripControlsElement, siteMenuComponent);
 
@@ -64,4 +68,6 @@ const handleSiteMenuClick = (menuItem) => {
 
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
-
+api.getEvents().then((event) => {
+  // console.log(event);
+});
