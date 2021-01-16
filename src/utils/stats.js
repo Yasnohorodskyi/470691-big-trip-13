@@ -1,7 +1,6 @@
 import {getDuration} from "./date";
 
 export const getStats = (events) => {
-  console.log({events});
   const stats = {
     taxi: {
       totalSpent: 0,

@@ -9,11 +9,12 @@ import FilterPresenter from "./presenter/filter";
 import EventsModel from "./model/events";
 import FilterModel from "./model/filter";
 import {sortByDate} from "./utils/sort";
-import {render} from "./utils/render";
+import {remove, render} from "./utils/render";
 import {MenuItem} from "./utils/menu-item";
 import {UpdateType} from "./utils/update-type";
 import {FilterType} from "./utils/filter";
 import Api from "./api";
+import {disableNewEventButton} from "./utils/common";
 
 dayjs.extend(customParseFormat);
 
@@ -33,34 +34,26 @@ const api = new Api(END_POINT, AUTHORIZATION);
 const tripPresenter = new TripPresenter(mainTripElement, tripEventsContainer, eventsModel, filterModel, api);
 const filterPresenter = new FilterPresenter(tripControlsElement, filterModel);
 
+tripPresenter.init();
+
 let statisticsComponent = null;
 
 api.getEvents().then((events) => {
-  filterPresenter.init();
-
   eventsModel.setEvents(UpdateType.INIT, events);
   events.sort(sortByDate);
-  statisticsComponent = new StatisticsView(eventsModel.getEvents());
-  render(pageBodyContainerElement, statisticsComponent);
-
   render(tripControlsElement, siteMenuComponent);
   siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 })
   .catch(() => {
-    filterPresenter.init();
-
     eventsModel.setEvents(UpdateType.INIT, []);
-    statisticsComponent = new StatisticsView(eventsModel.getEvents());
-    render(pageBodyContainerElement, statisticsComponent);
-
     render(tripControlsElement, siteMenuComponent);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+  }).finally(() => {
+    disableNewEventButton(false);
+    filterPresenter.init();
   });
 
-tripPresenter.init();
-
-document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {
-  evt.preventDefault();
+document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, () => {
   tripPresenter.createTask();
 });
 
@@ -68,13 +61,13 @@ const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.TABLE:
       filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-      statisticsComponent.hide();
       tripPresenter.show();
+      remove(statisticsComponent);
       break;
     case MenuItem.STATISTICS:
-      // tripPresenter.destroy();
-      statisticsComponent.show();
       tripPresenter.hide();
+      statisticsComponent = new StatisticsView(eventsModel.getEvents());
+      render(pageBodyContainerElement, statisticsComponent);
       break;
   }
 };

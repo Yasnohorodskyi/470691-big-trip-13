@@ -44,9 +44,6 @@ export default class TripPresenter {
   }
 
   init() {
-    render(this._mainTripContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
-    render(this._tripInfoComponent.getElement(), this._tripPriceComponent);
-
     render(this._tripEventsContainer, this._eventListComponent);
 
     this._eventsModel.addObserver(this._handleModelEvent);
@@ -114,6 +111,8 @@ export default class TripPresenter {
       return;
     }
 
+    render(this._mainTripContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
+    render(this._tripInfoComponent.getElement(), this._tripPriceComponent);
     this._renderSort();
     this._renderEventsList();
   }
@@ -182,7 +181,6 @@ export default class TripPresenter {
         break;
       case UpdateType.INIT:
         this._isLoading = false;
-        this.hide();
         remove(this._loadingComponent);
         this._renderTripBoard();
         break;
