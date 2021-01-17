@@ -4,6 +4,7 @@ import {remove, render, RenderPosition} from "../utils/render";
 import {UserAction} from "../utils/user-action";
 import {UpdateType} from "../utils/update-type";
 import {isEscPressed} from "../utils/button-codes";
+import {disableNewEventButton} from "../utils/common";
 
 export default class EventNew {
   constructor(eventListContainer, changeData) {
@@ -28,7 +29,7 @@ export default class EventNew {
 
     render(this._eventListContainer, this._formEditComponent, RenderPosition.AFTERBEGIN);
 
-    document.querySelector(`.trip-main__event-add-btn`).disabled = true;
+    disableNewEventButton(true);
     document.addEventListener(`keydown`, this._escKeyDownHandler);
   }
 
@@ -40,7 +41,7 @@ export default class EventNew {
     remove(this._formEditComponent);
     this._formEditComponent = null;
 
-    document.querySelector(`.trip-main__event-add-btn`).disabled = false;
+    disableNewEventButton(false);
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 

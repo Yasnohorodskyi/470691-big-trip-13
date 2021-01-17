@@ -76,11 +76,10 @@ const getChartOptions = (chartName, formatter) => ({
   }
 });
 
+const BAR_HEIGHT = 55;
+
 const renderMoneyStats = (moneyCtx, statsData) => {
-  const BAR_HEIGHT = 55;
   moneyCtx.height = BAR_HEIGHT * 5;
-  // typeCtx.height = BAR_HEIGHT * 5;
-  // timeCtx.height = BAR_HEIGHT * 5;
 
   return new Chart(moneyCtx, {
     plugins: [ChartDataLabels],
@@ -99,7 +98,6 @@ const renderMoneyStats = (moneyCtx, statsData) => {
 };
 
 const renderTypeStats = (typeCtx, statsData) => {
-  const BAR_HEIGHT = 55;
   typeCtx.height = BAR_HEIGHT * 5;
 
   return new Chart(typeCtx, {
@@ -119,9 +117,7 @@ const renderTypeStats = (typeCtx, statsData) => {
 };
 
 const renderTimeStats = (timeCtx, statsData) => {
-  const BAR_HEIGHT = 55;
   timeCtx.height = BAR_HEIGHT * 5;
-
 
   return new Chart(timeCtx, {
     plugins: [ChartDataLabels],
@@ -166,7 +162,6 @@ export default class Statistics extends SmartView {
     const typeCtx = this.getElement().querySelector(`.statistics__chart--transport`);
     const timeCtx = this.getElement().querySelector(`.statistics__chart--time`);
     this._moneyChart = renderMoneyStats(moneyCtx, this._statsData);
-    // console.log(this._statsData)
     this._typeChart = renderTypeStats(typeCtx, this._statsData);
     this._timeChart = renderTimeStats(timeCtx, this._statsData);
   }

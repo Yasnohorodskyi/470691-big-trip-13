@@ -130,7 +130,7 @@ const createPhotosTemplate = (photos) => {
   }
 
   const photosFragment = photos.map((photo) => (`
-    <img class="event__photo" src="${photo}" alt="Event photo">
+    <img class="event__photo" src="${photo.src}" alt="${photo.description}">
   `)).join(``);
 
   return (

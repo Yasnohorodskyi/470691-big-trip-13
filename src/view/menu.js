@@ -4,8 +4,8 @@ import AbstractView from "./abstract";
 const createSiteMenuTemplate = () => {
   return (
     `<nav class="trip-controls__trip-tabs  trip-tabs">
-      <a class="trip-tabs__btn" href="#" id="${MenuItem.TABLE}">Table</a>
-      <a class="trip-tabs__btn  trip-tabs__btn--active" href="#" id="${MenuItem.STATISTICS}">Stats</a>
+      <a class="trip-tabs__btn trip-tabs__btn--active" href="#" id="${MenuItem.TABLE}">Table</a>
+      <a class="trip-tabs__btn" href="#" id="${MenuItem.STATISTICS}">Stats</a>
     </nav>`
   );
 };
