@@ -6,25 +6,28 @@ import {isEscPressed} from "../utils/button-codes";
 import {disableNewEventButton} from "../utils/common";
 
 export default class EventNew {
-  constructor(eventListContainer, changeData) {
+  constructor(eventListContainer, changeData, offersModel) {
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
+    this._offersModel = offersModel;
 
     this._formEditComponent = null;
 
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
+    this._handleTypeChange = this._handleTypeChange.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init() {
+  init(event) {
     if (this._formEditComponent !== null) {
       return;
     }
 
-    this._formEditComponent = new EventFormView({}, window.allDestinations, true);
+    this._formEditComponent = new EventFormView(event, window.allDestinations, true);
     this._formEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._formEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+    this._formEditComponent.setTypeChangeHandler(this._handleTypeChange);
 
     render(this._eventListContainer, this._formEditComponent, RenderPosition.AFTERBEGIN);
 
@@ -51,6 +54,12 @@ export default class EventNew {
 
   _handleDeleteClick() {
     this.destroy();
+  }
+
+  _handleTypeChange(type) {
+    this._formEditComponent.reset({
+      offers: this._offersModel.getOffersByType(type)
+    });
   }
 
   _escKeyDownHandler(evt) {

@@ -12,10 +12,11 @@ const Mode = {
 };
 
 export default class EventPresenter {
-  constructor(eventListContainer, changeData, changeMode) {
+  constructor(eventListContainer, changeData, changeMode, offersModel) {
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._offersModel = offersModel;
 
     this._eventComponent = null;
     this._eventFormComponent = null;
@@ -27,6 +28,7 @@ export default class EventPresenter {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
+    this._handleTypeChange = this._handleTypeChange.bind(this);
   }
 
   init(event) {
@@ -42,6 +44,7 @@ export default class EventPresenter {
     this._eventFormComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._eventComponent.setFavoriteClick(this._handleFavoriteClick);
     this._eventFormComponent.setDeleteClickHandler(this._handleDeleteClick);
+    this._eventFormComponent.setTypeChangeHandler(this._handleTypeChange);
 
     if (prevEventComponent === null || prevFormComponent === null) {
       render(this._eventListContainer, this._eventComponent);
@@ -108,6 +111,12 @@ export default class EventPresenter {
 
   _handleDeleteClick(event) {
     this._changeData(UserAction.DELETE_EVENT, UpdateType.MINOR, event);
+  }
+
+  _handleTypeChange(type) {
+    this._eventFormComponent.reset({
+      offers: this._offersModel.getOffersByType(type)
+    });
   }
 
   _onEscKeyDown(evt) {

@@ -1,4 +1,5 @@
 import EventsModel from "./model/events";
+import OffersModel from "./model/offers";
 
 const Method = {
   GET: `GET`,
@@ -27,7 +28,7 @@ export default class Api {
   }
 
   getOffers() {
-    return this._load({url: `offers`}).then(Api.toJSON);
+    return this._load({url: `offers`}).then(Api.toJSON).then((offers) => offers.map(OffersModel.adaptAllToClient));
   }
 
   updateEvent(event) {
@@ -40,7 +41,6 @@ export default class Api {
   }
 
   addEvent(event) {
-    console.log(event)
     return this._load({
       url: `points`,
       method: Method.POST,

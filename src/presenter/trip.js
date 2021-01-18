@@ -13,13 +13,15 @@ import {UpdateType} from "../utils/update-type";
 import {UserAction} from "../utils/user-action";
 import {filter} from "../utils/filter";
 import {FilterType} from "../utils/filter";
+import {EVENT_TYPES} from "../utils/event-types";
 
 export default class TripPresenter {
-  constructor(mainTripContainer, tripEventsContainer, eventsModel, filterModel, api) {
+  constructor(mainTripContainer, tripEventsContainer, eventsModel, filterModel, offersModel, api) {
     this._mainTripContainer = mainTripContainer;
     this._tripEventsContainer = tripEventsContainer;
     this._eventsModel = eventsModel;
     this._filterModel = filterModel;
+    this._offersModel = offersModel;
     this._eventPresenter = {};
     this._currentSortType = SortType.DAY;
     this._isLoading = true;
@@ -38,9 +40,7 @@ export default class TripPresenter {
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
 
-    this._eventNewPresenter = new EventNewPresenter(this._eventListComponent, this._handleViewAction);
-
-
+    this._eventNewPresenter = new EventNewPresenter(this._eventListComponent, this._handleViewAction, this._offersModel);
   }
 
   init() {
@@ -81,9 +81,23 @@ export default class TripPresenter {
     render(this._tripEventsContainer, this._tripSortComponent, RenderPosition.AFTERBEGIN);
   }
 
+  _getEventWithOffers(event) {
+    const offersForType = this._offersModel.getOffersByType(event.type);
+    const offers = offersForType.map((offer) => {
+      const localOffer = event.offers.find(({name}) => name === offer.name);
+      return Object.assign({}, offer, {
+        isSelected: localOffer ? localOffer.isSelected : false
+      });
+    });
+
+    return Object.assign({}, event, {
+      offers
+    });
+  }
+
   _renderEvent(eventsListContainer, event) {
-    const eventPresenter = new EventPresenter(eventsListContainer, this._handleViewAction, this._handleModeChange);
-    eventPresenter.init(event);
+    const eventPresenter = new EventPresenter(eventsListContainer, this._handleViewAction, this._handleModeChange, this._offersModel);
+    eventPresenter.init(this._getEventWithOffers(event));
     this._eventPresenter[event.id] = eventPresenter;
   }
 
@@ -154,12 +168,12 @@ export default class TripPresenter {
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
         this._api.updateEvent(update).then((response) => {
-          this._eventsModel.updateEvent(updateType, response);
+          this._eventsModel.updateEvent(updateType, this._getEventWithOffers(response));
         });
         break;
       case UserAction.ADD_EVENT:
         this._api.addEvent(update).then((response) => {
-          this._eventsModel.addEvent(updateType, response);
+          this._eventsModel.addEvent(updateType, this._getEventWithOffers(response));
         });
         break;
       case UserAction.DELETE_EVENT:
@@ -206,10 +220,13 @@ export default class TripPresenter {
     this._renderTripBoard();
   }
 
-  createTask() {
+  createEvent() {
     this._currentSortType = SortType.DEFAULT;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this._eventNewPresenter.init();
+    const newEvent = {
+      type: EVENT_TYPES[0], destinationName: ``, price: ``, offers: [], destinationInfo: null
+    };
+    this._eventNewPresenter.init(this._getEventWithOffers(newEvent));
   }
 }
 

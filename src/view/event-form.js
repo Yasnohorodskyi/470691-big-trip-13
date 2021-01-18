@@ -12,9 +12,6 @@ const DAYJS_DATE_FORMAT = `DD/MM/YY HH:mm`;
 const createEventFormTemplate = (event = {}, isNewEvent = false) => {
   const {type = EVENT_TYPES[0], destinationName = ``, price = ``, offers = [], destinationInfo} = event;
 
-  const allOffers = window.allOffers.find((offersList) => offersList.type === type);
-
-
   const typesFragment = EVENT_TYPES.map((eventType) => (`
     <div class="event__type-item">
       <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${eventType === type ? `checked=""` : ``}>
@@ -153,7 +150,6 @@ export default class EventForm extends Smart {
     this._data = EventForm.parseEventToData(event);
     this._startDatePicker = null;
     this._allDestinations = allDestinations;
-    console.log('constructor', this._allDestinations.length);
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
@@ -188,6 +184,13 @@ export default class EventForm extends Smart {
     }
   }
 
+  _getSelectedOffers() {
+    return this._data.offers.map((offer) => {
+      const offerIsSelected = this.getElement().querySelector(`[name="event-offer-${offer.name}"]`).checked;
+      return Object.assign({}, offer, {isSelected: offerIsSelected});
+    });
+  }
+
   _closeFormHandler(evt) {
     evt.preventDefault();
     this._callback.closeClick();
@@ -199,17 +202,13 @@ export default class EventForm extends Smart {
     const startDate = dayjs(startDateUnformatted, DAYJS_DATE_FORMAT).format();
     const endDateUnformatted = this.getElement().querySelector(`[name="event-end-time"]`).value;
     const endDate = dayjs(endDateUnformatted, DAYJS_DATE_FORMAT).format();
-    const offers = this._data.offers ? this._data.offers.map((offer) => {
-      const offerIsSelected = this.getElement().querySelector(`[name="event-offer-${offer.name}"]`).checked;
-      return Object.assign({}, offer, {isSelected: offerIsSelected});
-    }) : [];
 
     const newData = {
       price: +this.getElement().querySelector(`.event__input--price`).value,
       destinationName: this.getElement().querySelector(`.event__input--destination`).value,
       startDate,
       endDate,
-      offers,
+      offers: this._getSelectedOffers(),
     };
 
     if (this._isEventCreationForm) {
@@ -226,10 +225,6 @@ export default class EventForm extends Smart {
   }
 
   _setInnerHandlers() {
-    this.getElement().querySelectorAll(`[name="event-type"]`).forEach((typeButtonElement) => {
-      typeButtonElement.addEventListener(`change`, this._eventTypeHandler);
-    });
-
     this.getElement().querySelector(`.event__input--destination`).addEventListener(`input`, this._destinationNameChangeHandler);
     this.getElement().querySelector(`.event__input--price`).addEventListener(`input`, this._priceChangeHandler);
   }
@@ -289,12 +284,12 @@ export default class EventForm extends Smart {
   }
 
   _eventTypeHandler(evt) {
-    // const currentOffers = window.allOffers.find((offers) => offers.type === evt.target.value);
+    const type = evt.target.value;
 
     this.updateData({
       type: evt.target.value,
-      // offers: currentOffers ? currentOffers.offers : []
     }, false);
+    this._callback.changeType(type);
   }
 
   _formDeleteClickHandler(evt) {
@@ -316,16 +311,25 @@ export default class EventForm extends Smart {
           description: destinationInfo.description,
           photos: destinationInfo.pictures,
         },
-        destinationName: destinationInfo.name
+        destinationName: destinationInfo.name,
+        offers: this._getSelectedOffers(),
       }, false);
     }
   }
 
   _priceChangeHandler(evt) {
-    const isPriceValid = +evt.target.value > 0;
+    const price = +evt.target.value;
+    const isPriceValid = price > 0;
     const destinationName = this.getElement().querySelector(`.event__input--destination`).value;
     const isDestinationNameValid = destinationName !== ``;
+
     this._disableSaveButton(!isPriceValid || !isDestinationNameValid);
+
+    if (isPriceValid) {
+      this.updateData({
+        price
+      });
+    }
   }
 
   _disableSaveButton(isDisabled) {
@@ -346,6 +350,7 @@ export default class EventForm extends Smart {
     this._setEndDatePicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
+    this.setTypeChangeHandler(this._callback.changeType);
     if (!this._isEventCreationForm) {
       this.setCloseFormHandler(this._callback.closeClick);
     }
@@ -364,6 +369,13 @@ export default class EventForm extends Smart {
   setDeleteClickHandler(callback) {
     this._callback.deleteClick = callback;
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
+  }
+
+  setTypeChangeHandler(callback) {
+    this._callback.changeType = callback;
+    this.getElement().querySelectorAll(`[name="event-type"]`).forEach((typeButtonElement) => {
+      typeButtonElement.addEventListener(`change`, this._eventTypeHandler);
+    });
   }
 
   static parseEventToData(event) {

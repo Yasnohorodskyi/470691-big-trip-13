@@ -8,6 +8,7 @@ import TripPresenter from "./presenter/trip";
 import FilterPresenter from "./presenter/filter";
 import EventsModel from "./model/events";
 import FilterModel from "./model/filter";
+import OffersModel from "./model/offers";
 import {sortByDate} from "./utils/sort";
 import {remove, render} from "./utils/render";
 import {MenuItem} from "./utils/menu-item";
@@ -23,6 +24,7 @@ const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 const eventsModel = new EventsModel();
 const filterModel = new FilterModel();
+const offersModel = new OffersModel();
 
 const siteMenuComponent = new SiteMenuView();
 
@@ -31,7 +33,7 @@ const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
 const tripEventsContainer = document.querySelector(`.trip-events`);
 const pageBodyContainerElement = document.querySelector(`.page-main .page-body__container`);
 const api = new Api(END_POINT, AUTHORIZATION);
-const tripPresenter = new TripPresenter(mainTripElement, tripEventsContainer, eventsModel, filterModel, api);
+const tripPresenter = new TripPresenter(mainTripElement, tripEventsContainer, eventsModel, filterModel, offersModel, api);
 const filterPresenter = new FilterPresenter(tripControlsElement, filterModel);
 
 tripPresenter.init();
@@ -39,9 +41,8 @@ tripPresenter.init();
 let statisticsComponent = null;
 
 Promise.all([api.getEvents(), api.getDestinations(), api.getOffers()]).then(([events, destinations, offers]) => {
-  console.log(offers);
   window.allDestinations = destinations;
-  window.allOffers = offers;
+  offersModel.setOffers(UpdateType.INIT, offers);
   eventsModel.setEvents(UpdateType.INIT, events);
   events.sort(sortByDate);
   render(tripControlsElement, siteMenuComponent);
@@ -58,7 +59,7 @@ Promise.all([api.getEvents(), api.getDestinations(), api.getOffers()]).then(([ev
   });
 
 document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, () => {
-  tripPresenter.createTask();
+  tripPresenter.createEvent();
 });
 
 const handleSiteMenuClick = (menuItem) => {
