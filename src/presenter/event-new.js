@@ -1,5 +1,4 @@
 import EventFormView from "../view/event-form";
-import {generateId} from "../mock/event";
 import {remove, render, RenderPosition} from "../utils/render";
 import {UserAction} from "../utils/user-action";
 import {UpdateType} from "../utils/update-type";
@@ -23,7 +22,7 @@ export default class EventNew {
       return;
     }
 
-    this._formEditComponent = new EventFormView({}, true);
+    this._formEditComponent = new EventFormView({}, window.allDestinations, true);
     this._formEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._formEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
@@ -46,7 +45,7 @@ export default class EventNew {
   }
 
   _handleFormSubmit(event) {
-    this._changeData(UserAction.ADD_EVENT, UpdateType.MINOR, Object.assign({id: generateId()}, event));
+    this._changeData(UserAction.ADD_EVENT, UpdateType.MINOR, event);
     this.destroy();
   }
 

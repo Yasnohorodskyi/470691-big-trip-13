@@ -35,7 +35,7 @@ export default class EventPresenter {
 
     this._event = event;
     this._eventComponent = new EventView(event);
-    this._eventFormComponent = new EventFormView(event);
+    this._eventFormComponent = new EventFormView(event, window.allDestinations);
 
     this._eventComponent.setEditClickHandler(this._handleEditClick);
     this._eventFormComponent.setCloseFormHandler(this._handleCloseForm);

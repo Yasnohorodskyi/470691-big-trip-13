@@ -57,10 +57,9 @@ export default class Events extends Observer {
   static adaptToClient(event) {
     const offers = event.offers.map((offer) => {
       return {
-        type: offer.title, // TODO: check if the field is needed
         name: offer.title,
         price: offer.price,
-        isSelected: false
+        isSelected: true
       };
     });
 
@@ -82,7 +81,7 @@ export default class Events extends Observer {
     return adaptedEvent;
   }
 
-  static adaptToServer(event) {
+  static adaptToServer(event, isNew = false) {
     const offers = event.offers.map((offer) => {
       return {
         "title": offer.name,
@@ -104,6 +103,11 @@ export default class Events extends Observer {
       offers,
       "type": event.type
     });
+
+    if (isNew) {
+      adaptedEvent[`is_favorite`] = false;
+      delete adaptedEvent.id;
+    }
 
     return adaptedEvent;
   }

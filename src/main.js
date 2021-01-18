@@ -38,16 +38,20 @@ tripPresenter.init();
 
 let statisticsComponent = null;
 
-api.getEvents().then((events) => {
+Promise.all([api.getEvents(), api.getDestinations(), api.getOffers()]).then(([events, destinations, offers]) => {
+  console.log(offers);
+  window.allDestinations = destinations;
+  window.allOffers = offers;
   eventsModel.setEvents(UpdateType.INIT, events);
   events.sort(sortByDate);
   render(tripControlsElement, siteMenuComponent);
   siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 })
-  .catch(() => {
+  .catch((e) => {
     eventsModel.setEvents(UpdateType.INIT, []);
     render(tripControlsElement, siteMenuComponent);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+    throw e;
   }).finally(() => {
     disableNewEventButton(false);
     filterPresenter.init();

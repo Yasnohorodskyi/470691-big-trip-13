@@ -12,6 +12,9 @@ const DAYJS_DATE_FORMAT = `DD/MM/YY HH:mm`;
 const createEventFormTemplate = (event = {}, isNewEvent = false) => {
   const {type = EVENT_TYPES[0], destinationName = ``, price = ``, offers = [], destinationInfo} = event;
 
+  const allOffers = window.allOffers.find((offersList) => offersList.type === type);
+
+
   const typesFragment = EVENT_TYPES.map((eventType) => (`
     <div class="event__type-item">
       <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${eventType === type ? `checked=""` : ``}>
@@ -19,6 +22,9 @@ const createEventFormTemplate = (event = {}, isNewEvent = false) => {
     </div>
   `)).join(``);
 
+  const destinationOptions = window.allDestinations.map((destination) => (`
+    <option value="${destination.name}"></option>
+  `)).join(``);
 
   return (
     `<li class="trip-events__item">
@@ -45,9 +51,7 @@ const createEventFormTemplate = (event = {}, isNewEvent = false) => {
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationName}" list="destination-list-1">
             <datalist id="destination-list-1">
-              <option value="Amsterdam"></option>
-              <option value="Geneva"></option>
-              <option value="Chamonix"></option>
+              ${destinationOptions}
             </datalist>
           </div>
 
@@ -104,8 +108,8 @@ const createOffersTemplate = (offers) => {
 
   const offersFragment = offers.map((offer) => (`
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${offer.isSelected ? `checked=""` : ``}>
-      <label class="event__offer-label" for="event-offer-${offer.type}-1">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.name}-1" type="checkbox" name="event-offer-${offer.name}" ${offer.isSelected ? `checked=""` : ``}>
+      <label class="event__offer-label" for="event-offer-${offer.name}-1">
         <span class="event__offer-title">${offer.name}</span>
         +€&nbsp;
         <span class="event__offer-price">${offer.price}</span>
@@ -143,11 +147,13 @@ const createPhotosTemplate = (photos) => {
 };
 
 export default class EventForm extends Smart {
-  constructor(event, isNew = false) {
+  constructor(event, allDestinations, isNew = false) {
     super();
     this._isEventCreationForm = isNew;
     this._data = EventForm.parseEventToData(event);
     this._startDatePicker = null;
+    this._allDestinations = allDestinations;
+    console.log('constructor', this._allDestinations.length);
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
@@ -194,7 +200,7 @@ export default class EventForm extends Smart {
     const endDateUnformatted = this.getElement().querySelector(`[name="event-end-time"]`).value;
     const endDate = dayjs(endDateUnformatted, DAYJS_DATE_FORMAT).format();
     const offers = this._data.offers ? this._data.offers.map((offer) => {
-      const offerIsSelected = this.getElement().querySelector(`[name="event-offer-${offer.type}"]`).checked;
+      const offerIsSelected = this.getElement().querySelector(`[name="event-offer-${offer.name}"]`).checked;
       return Object.assign({}, offer, {isSelected: offerIsSelected});
     }) : [];
 
@@ -283,8 +289,11 @@ export default class EventForm extends Smart {
   }
 
   _eventTypeHandler(evt) {
+    // const currentOffers = window.allOffers.find((offers) => offers.type === evt.target.value);
+
     this.updateData({
       type: evt.target.value,
+      // offers: currentOffers ? currentOffers.offers : []
     }, false);
   }
 
@@ -294,10 +303,22 @@ export default class EventForm extends Smart {
   }
 
   _destinationNameChangeHandler(evt) {
-    const isDestinationNameValid = evt.target.value !== ``;
+    const destinationInfo = this._allDestinations.find((destination) => destination.name === evt.target.value)
+    const isDestinationNameValid = evt.target.value !== `` && destinationInfo;
     const price = this.getElement().querySelector(`.event__input--price`).value;
     const isPriceValid = +price > 0;
+
     this._disableSaveButton(!isDestinationNameValid || !isPriceValid);
+
+    if (isDestinationNameValid) {
+      this.updateData({
+        destinationInfo: {
+          description: destinationInfo.description,
+          photos: destinationInfo.pictures,
+        },
+        destinationName: destinationInfo.name
+      }, false);
+    }
   }
 
   _priceChangeHandler(evt) {
@@ -324,8 +345,10 @@ export default class EventForm extends Smart {
     this._setStartDatePicker();
     this._setEndDatePicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setCloseFormHandler(this._callback.closeClick);
     this.setDeleteClickHandler(this._callback.deleteClick);
+    if (!this._isEventCreationForm) {
+      this.setCloseFormHandler(this._callback.closeClick);
+    }
   }
 
   setFormSubmitHandler(callback) {
