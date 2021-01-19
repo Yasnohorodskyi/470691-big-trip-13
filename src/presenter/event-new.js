@@ -6,10 +6,11 @@ import {isEscPressed} from "../utils/button-codes";
 import {disableNewEventButton} from "../utils/common";
 
 export default class EventNew {
-  constructor(eventListContainer, changeData, offersModel) {
+  constructor(eventListContainer, changeData, offersModel, destinationsModel) {
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
     this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
 
     this._formEditComponent = null;
 
@@ -24,7 +25,7 @@ export default class EventNew {
       return;
     }
 
-    this._formEditComponent = new EventFormView(event, window.allDestinations, true);
+    this._formEditComponent = new EventFormView(event, this._destinationsModel.getDestinations(), true);
     this._formEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._formEditComponent.setDeleteClickHandler(this._handleDeleteClick);
     this._formEditComponent.setTypeChangeHandler(this._handleTypeChange);

@@ -9,7 +9,7 @@ import Smart from "./smart";
 
 const DAYJS_DATE_FORMAT = `DD/MM/YY HH:mm`;
 
-const createEventFormTemplate = (event = {}, isNewEvent = false) => {
+const createEventFormTemplate = (event = {}, allDestinations = [], isNewEvent = false) => {
   const {type = EVENT_TYPES[0], destinationName = ``, price = ``, offers = [], destinationInfo} = event;
 
   const typesFragment = EVENT_TYPES.map((eventType) => (`
@@ -19,7 +19,7 @@ const createEventFormTemplate = (event = {}, isNewEvent = false) => {
     </div>
   `)).join(``);
 
-  const destinationOptions = window.allDestinations.map((destination) => (`
+  const destinationOptions = allDestinations.map((destination) => (`
     <option value="${destination.name}"></option>
   `)).join(``);
 
@@ -170,7 +170,7 @@ export default class EventForm extends Smart {
   }
 
   getTemplate() {
-    return createEventFormTemplate(this._data, this._isEventCreationForm);
+    return createEventFormTemplate(this._data, this._allDestinations, this._isEventCreationForm);
   }
 
   removeElement() {
@@ -298,7 +298,7 @@ export default class EventForm extends Smart {
   }
 
   _destinationNameChangeHandler(evt) {
-    const destinationInfo = this._allDestinations.find((destination) => destination.name === evt.target.value)
+    const destinationInfo = this._allDestinations.find((destination) => destination.name === evt.target.value);
     const isDestinationNameValid = evt.target.value !== `` && destinationInfo;
     const price = this.getElement().querySelector(`.event__input--price`).value;
     const isPriceValid = +price > 0;

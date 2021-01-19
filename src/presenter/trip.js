@@ -16,12 +16,13 @@ import {FilterType} from "../utils/filter";
 import {EVENT_TYPES} from "../utils/event-types";
 
 export default class TripPresenter {
-  constructor(mainTripContainer, tripEventsContainer, eventsModel, filterModel, offersModel, api) {
+  constructor(mainTripContainer, tripEventsContainer, eventsModel, filterModel, offersModel, destinationsModel, api) {
     this._mainTripContainer = mainTripContainer;
     this._tripEventsContainer = tripEventsContainer;
     this._eventsModel = eventsModel;
     this._filterModel = filterModel;
     this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
     this._eventPresenter = {};
     this._currentSortType = SortType.DAY;
     this._isLoading = true;
@@ -40,7 +41,7 @@ export default class TripPresenter {
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
 
-    this._eventNewPresenter = new EventNewPresenter(this._eventListComponent, this._handleViewAction, this._offersModel);
+    this._eventNewPresenter = new EventNewPresenter(this._eventListComponent, this._handleViewAction, this._offersModel, this._destinationsModel);
   }
 
   init() {
@@ -96,7 +97,7 @@ export default class TripPresenter {
   }
 
   _renderEvent(eventsListContainer, event) {
-    const eventPresenter = new EventPresenter(eventsListContainer, this._handleViewAction, this._handleModeChange, this._offersModel);
+    const eventPresenter = new EventPresenter(eventsListContainer, this._handleViewAction, this._handleModeChange, this._offersModel, this._destinationsModel);
     eventPresenter.init(this._getEventWithOffers(event));
     this._eventPresenter[event.id] = eventPresenter;
   }

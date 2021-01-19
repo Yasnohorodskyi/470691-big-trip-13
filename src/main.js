@@ -16,6 +16,7 @@ import {UpdateType} from "./utils/update-type";
 import {FilterType} from "./utils/filter";
 import Api from "./api";
 import {disableNewEventButton} from "./utils/common";
+import DestinationsModel from "./model/destinations";
 
 dayjs.extend(customParseFormat);
 
@@ -25,6 +26,7 @@ const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 const eventsModel = new EventsModel();
 const filterModel = new FilterModel();
 const offersModel = new OffersModel();
+const destinationsModel = new DestinationsModel();
 
 const siteMenuComponent = new SiteMenuView();
 
@@ -33,7 +35,7 @@ const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
 const tripEventsContainer = document.querySelector(`.trip-events`);
 const pageBodyContainerElement = document.querySelector(`.page-main .page-body__container`);
 const api = new Api(END_POINT, AUTHORIZATION);
-const tripPresenter = new TripPresenter(mainTripElement, tripEventsContainer, eventsModel, filterModel, offersModel, api);
+const tripPresenter = new TripPresenter(mainTripElement, tripEventsContainer, eventsModel, filterModel, offersModel, destinationsModel, api);
 const filterPresenter = new FilterPresenter(tripControlsElement, filterModel);
 
 tripPresenter.init();
@@ -41,7 +43,7 @@ tripPresenter.init();
 let statisticsComponent = null;
 
 Promise.all([api.getEvents(), api.getDestinations(), api.getOffers()]).then(([events, destinations, offers]) => {
-  window.allDestinations = destinations;
+  destinationsModel.setDestinations(UpdateType.INIT, destinations);
   offersModel.setOffers(UpdateType.INIT, offers);
   eventsModel.setEvents(UpdateType.INIT, events);
   events.sort(sortByDate);

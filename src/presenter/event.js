@@ -12,11 +12,12 @@ const Mode = {
 };
 
 export default class EventPresenter {
-  constructor(eventListContainer, changeData, changeMode, offersModel) {
+  constructor(eventListContainer, changeData, changeMode, offersModel, destinationsModel) {
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
 
     this._eventComponent = null;
     this._eventFormComponent = null;
@@ -37,7 +38,7 @@ export default class EventPresenter {
 
     this._event = event;
     this._eventComponent = new EventView(event);
-    this._eventFormComponent = new EventFormView(event, window.allDestinations);
+    this._eventFormComponent = new EventFormView(event, this._destinationsModel.getDestinations());
 
     this._eventComponent.setEditClickHandler(this._handleEditClick);
     this._eventFormComponent.setCloseFormHandler(this._handleCloseForm);
