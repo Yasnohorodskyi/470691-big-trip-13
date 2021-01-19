@@ -11,6 +11,11 @@ const Mode = {
   EDITING: `EDITING`
 };
 
+export const State = {
+  SAVING: `SAVING`,
+  DELETING: `DELETING`
+};
+
 export default class EventPresenter {
   constructor(eventListContainer, changeData, changeMode, offersModel, destinationsModel) {
     this._eventListContainer = eventListContainer;
@@ -57,11 +62,31 @@ export default class EventPresenter {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._eventListContainer, this._eventFormComponent, prevFormComponent);
+      // console.log(this._eventListContainer, this._eventComponent, prevEventComponent);
+      // replace(this._eventListContainer, this._eventFormComponent, prevFormComponent);
+      replace(this._eventListContainer, this._eventComponent, prevFormComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(prevEventComponent);
     remove(prevFormComponent);
+  }
+
+  setViewState(state) {
+    switch (state) {
+      case State.SAVING:
+        this._eventFormComponent.updateData({
+          isDisabled: true,
+          isSaving: true
+        }, false);
+        break;
+      case State.DELETING:
+        this._eventFormComponent.updateData({
+          isDisabled: true,
+          isDeleting: true
+        }, false);
+        break;
+    }
   }
 
   destroy() {
@@ -105,7 +130,7 @@ export default class EventPresenter {
       !isDatesEqual(this._event.endDate, newData.endDate) ||
       this._event.price !== newData.price;
 
-    this._replaceFormToEvent();
+    // this._replaceFormToEvent();
 
     this._changeData(UserAction.UPDATE_EVENT, isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH, newData);
   }

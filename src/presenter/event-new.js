@@ -36,6 +36,13 @@ export default class EventNew {
     document.addEventListener(`keydown`, this._escKeyDownHandler);
   }
 
+  setSaving() {
+    this._formEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    }, false);
+  }
+
   destroy() {
     if (this._formEditComponent === null) {
       return;
@@ -50,7 +57,6 @@ export default class EventNew {
 
   _handleFormSubmit(event) {
     this._changeData(UserAction.ADD_EVENT, UpdateType.MINOR, event);
-    this.destroy();
   }
 
   _handleDeleteClick() {
