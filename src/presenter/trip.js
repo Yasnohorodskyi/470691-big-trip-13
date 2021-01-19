@@ -14,6 +14,7 @@ import {UserAction} from "../utils/user-action";
 import {filter} from "../utils/filter";
 import {FilterType} from "../utils/filter";
 import {EVENT_TYPES} from "../utils/event-types";
+import ErrorMessageView from "../view/error-mesage";
 
 export default class TripPresenter {
   constructor(mainTripContainer, tripEventsContainer, eventsModel, filterModel, offersModel, destinationsModel, api) {
@@ -27,6 +28,7 @@ export default class TripPresenter {
     this._currentSortType = SortType.DAY;
     this._isLoading = true;
     this._api = api;
+    this._hasError = false;
 
     this._tripSortComponent = null;
 
@@ -35,6 +37,7 @@ export default class TripPresenter {
     this._eventListComponent = new EventListView();
     this._emptyListComponent = new EmptyListView();
     this._loadingComponent = new LoadingView();
+    this._errorComponent = new ErrorMessageView();
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
@@ -118,6 +121,10 @@ export default class TripPresenter {
       return;
     }
 
+    if (this._hasError) {
+      this._renderError();
+    }
+
     const events = this._getEvents();
     const eventCount = events.length;
 
@@ -163,6 +170,10 @@ export default class TripPresenter {
 
   _renderLoading() {
     render(this._tripEventsContainer, this._loadingComponent);
+  }
+
+  _renderError() {
+    render(this._tripEventsContainer, this._errorComponent);
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -241,6 +252,10 @@ export default class TripPresenter {
       type: EVENT_TYPES[0], destinationName: ``, price: ``, offers: [], destinationInfo: null
     };
     this._eventNewPresenter.init(this._getEventWithOffers(newEvent));
+  }
+
+  setError() {
+    this._hasError = true;
   }
 }
 

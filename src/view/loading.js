@@ -1,7 +1,7 @@
 import AbstractView from "./abstract";
 
 const createNoEventTemplate = () => {
-  return `<p class="trip-events__msg0">Loading...</p>`;
+  return `<p class="trip-events__msg">Loading...</p>`;
 };
 
 export default class Loading extends AbstractView {

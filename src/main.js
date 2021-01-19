@@ -42,22 +42,30 @@ tripPresenter.init();
 
 let statisticsComponent = null;
 
-Promise.all([api.getEvents(), api.getDestinations(), api.getOffers()]).then(([events, destinations, offers]) => {
-  destinationsModel.setDestinations(UpdateType.INIT, destinations);
-  offersModel.setOffers(UpdateType.INIT, offers);
-  eventsModel.setEvents(UpdateType.INIT, events);
-  events.sort(sortByDate);
+Promise.allSettled([api.getEvents(), api.getDestinations(), api.getOffers()]).then(([events, destinations, offers]) => {
+  if (offers.status === `rejected` || destinations.status === `rejected`) {
+    disableNewEventButton(true);
+    tripPresenter.setError();
+    throw new Error(`Failed to fetch destinations or offers`);
+  }
+
+  destinationsModel.setDestinations(UpdateType.INIT, destinations.value);
+  offersModel.setOffers(UpdateType.INIT, offers.value);
+  disableNewEventButton(false);
+
+  if (events.status === `rejected`) {
+    throw new Error(`Failed to fetch points`);
+  }
+
+  eventsModel.setEvents(UpdateType.INIT, events.value);
+  events.value.sort(sortByDate);
   render(tripControlsElement, siteMenuComponent);
   siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+  filterPresenter.init();
 })
   .catch((e) => {
     eventsModel.setEvents(UpdateType.INIT, []);
-    render(tripControlsElement, siteMenuComponent);
-    siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
     throw e;
-  }).finally(() => {
-    disableNewEventButton(false);
-    filterPresenter.init();
   });
 
 document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, () => {

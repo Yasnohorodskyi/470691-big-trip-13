@@ -439,6 +439,10 @@ main {
   .trip-events__msg--hidden {
     display: none; }
 
+.trip-events__msg--error {
+  color: rgb(255, 123, 123);
+}
+
 .trip-events__list {
   padding: 0;
   margin: 0;
