@@ -43,6 +43,18 @@ export default class EventNew {
     }, false);
   }
 
+  setAborting() {
+    const resetFormState = () => {
+      this._formEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      }, false);
+    };
+
+    this._formEditComponent.shake(resetFormState);
+  }
+
   destroy() {
     if (this._formEditComponent === null) {
       return;
