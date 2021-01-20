@@ -1,10 +1,8 @@
 import dayjs from "dayjs";
 import flatpickr from "flatpickr";
-
-import "../../node_modules/flatpickr/dist/flatpickr.min.css";
+import "flatpickr/dist/flatpickr.min.css";
 
 import {EVENT_TYPES} from "../utils/event-types";
-
 import Smart from "./smart";
 
 const DAYJS_DATE_FORMAT = `DD/MM/YY HH:mm`;
@@ -195,6 +193,44 @@ export default class EventForm extends Smart {
     }
   }
 
+  reset(event) {
+    this.updateData(EventForm.parseEventToData(event), false);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this._setStartDatePicker();
+    this._setEndDatePicker();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+    this.setTypeChangeHandler(this._callback.changeType);
+    if (!this._isEventCreationForm) {
+      this.setCloseFormHandler(this._callback.closeClick);
+    }
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  setCloseFormHandler(callback) {
+    this._callback.closeClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeFormHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
+  }
+
+  setTypeChangeHandler(callback) {
+    this._callback.changeType = callback;
+    this.getElement().querySelectorAll(`[name="event-type"]`).forEach((typeButtonElement) => {
+      typeButtonElement.addEventListener(`change`, this._eventTypeHandler);
+    });
+  }
+
   _getSelectedOffers() {
     return this._data.offers.map((offer) => {
       const offerIsSelected = this.getElement().querySelector(`[name="event-offer-${offer.name}"]`).checked;
@@ -349,44 +385,6 @@ export default class EventForm extends Smart {
     } else {
       this.getElement().querySelector(`.event__save-btn`).removeAttribute(`disabled`);
     }
-  }
-
-  reset(event) {
-    this.updateData(EventForm.parseEventToData(event), false);
-  }
-
-  restoreHandlers() {
-    this._setInnerHandlers();
-    this._setStartDatePicker();
-    this._setEndDatePicker();
-    this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-    this.setTypeChangeHandler(this._callback.changeType);
-    if (!this._isEventCreationForm) {
-      this.setCloseFormHandler(this._callback.closeClick);
-    }
-  }
-
-  setFormSubmitHandler(callback) {
-    this._callback.formSubmit = callback;
-    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
-  }
-
-  setCloseFormHandler(callback) {
-    this._callback.closeClick = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeFormHandler);
-  }
-
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
-  }
-
-  setTypeChangeHandler(callback) {
-    this._callback.changeType = callback;
-    this.getElement().querySelectorAll(`[name="event-type"]`).forEach((typeButtonElement) => {
-      typeButtonElement.addEventListener(`change`, this._eventTypeHandler);
-    });
   }
 
   static parseEventToData(event) {

@@ -9,7 +9,6 @@ const createTripPriceTemplate = () => {
 };
 
 export default class TripPrice extends AbstractView {
-
   getTemplate() {
     return createTripPriceTemplate();
   }

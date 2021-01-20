@@ -8,13 +8,11 @@ import EventPresenter, {State as EventPresenterViewState} from "./event";
 import EventNewPresenter from "./event-new";
 import LoadingView from "../view/loading";
 import {sortByDate, sortByDuration, sortByPrice} from "../utils/sort";
-import {SortType} from "../utils/sort-type";
-import {UpdateType} from "../utils/update-type";
-import {UserAction} from "../utils/user-action";
 import {filter} from "../utils/filter";
 import {FilterType} from "../utils/filter";
 import {EVENT_TYPES} from "../utils/event-types";
-import ErrorMessageView from "../view/error-mesage";
+import ErrorMessageView from "../view/error-message";
+import {SortType, UpdateType, UserAction} from "../const";
 
 export default class TripPresenter {
   constructor(mainTripContainer, tripEventsContainer, eventsModel, filterModel, offersModel, destinationsModel, api) {
@@ -29,7 +27,6 @@ export default class TripPresenter {
     this._isLoading = true;
     this._api = api;
     this._hasError = false;
-
     this._tripSortComponent = null;
 
     this._tripInfoComponent = new TripInfoView();
@@ -72,6 +69,19 @@ export default class TripPresenter {
 
   hide() {
     this._tripEventsContainer.classList.add(`hide`);
+  }
+
+  createEvent() {
+    this._currentSortType = SortType.DEFAULT;
+    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    const newEvent = {
+      type: EVENT_TYPES[0], destinationName: ``, price: ``, offers: [], destinationInfo: null
+    };
+    this._eventNewPresenter.init(this._getEventWithOffers(newEvent));
+  }
+
+  setError() {
+    this._hasError = true;
   }
 
   _renderSort() {
@@ -243,19 +253,6 @@ export default class TripPresenter {
     this._currentSortType = sortType;
     this._clearTripBoard();
     this._renderTripBoard();
-  }
-
-  createEvent() {
-    this._currentSortType = SortType.DEFAULT;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    const newEvent = {
-      type: EVENT_TYPES[0], destinationName: ``, price: ``, offers: [], destinationInfo: null
-    };
-    this._eventNewPresenter.init(this._getEventWithOffers(newEvent));
-  }
-
-  setError() {
-    this._hasError = true;
   }
 }
 

@@ -1,9 +1,8 @@
 import EventFormView from "../view/event-form";
 import {remove, render, RenderPosition} from "../utils/render";
-import {UserAction} from "../utils/user-action";
-import {UpdateType} from "../utils/update-type";
 import {isEscPressed} from "../utils/button-codes";
 import {disableNewEventButton} from "../utils/common";
+import {UpdateType, UserAction} from "../const";
 
 export default class EventNew {
   constructor(eventListContainer, changeData, offersModel, destinationsModel) {

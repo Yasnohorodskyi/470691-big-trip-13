@@ -27,14 +27,6 @@ export default class Abstract {
     this._element = null;
   }
 
-  show() {
-    this._element.classList.remove(`hide`);
-  }
-
-  hide() {
-    this._element.classList.add(`hide`);
-  }
-
   shake(callback) {
     this.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
     setTimeout(() => {

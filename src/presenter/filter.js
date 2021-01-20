@@ -1,14 +1,13 @@
 import FilterView from "../view/trip-filters";
 import {render, replace, remove} from "../utils/render";
 import {FilterType} from "../utils/filter";
-import {UpdateType} from "../utils/update-type";
+import {UpdateType} from "../const";
 
 export default class Filter {
   constructor(filterContainer, filterModel) {
     this._filterContainer = filterContainer;
     this._filterModel = filterModel;
     this._currentFilter = null;
-
     this._filterComponent = null;
 
     this._handleModelEvent = this._handleModelEvent.bind(this);
