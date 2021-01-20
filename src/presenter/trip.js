@@ -1,5 +1,4 @@
-import TripInfoView from "../view/trip-info";
-import TripPriceView from "../view/trip-price";
+
 import TripSortView from "../view/trip-sort";
 import EventListView from "../view/list.js";
 import EmptyListView from "../view/list-empty";
@@ -29,8 +28,6 @@ export default class TripPresenter {
     this._hasError = false;
     this._tripSortComponent = null;
 
-    this._tripInfoComponent = new TripInfoView();
-    this._tripPriceComponent = new TripPriceView();
     this._eventListComponent = new EventListView();
     this._emptyListComponent = new EmptyListView();
     this._loadingComponent = new LoadingView();
@@ -143,8 +140,6 @@ export default class TripPresenter {
       return;
     }
 
-    render(this._mainTripContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
-    render(this._tripInfoComponent.getElement(), this._tripPriceComponent);
     this._renderSort();
     this._renderEventsList();
   }
