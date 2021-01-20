@@ -1,4 +1,3 @@
-
 import TripSortView from "../view/trip-sort";
 import EventListView from "../view/list.js";
 import EmptyListView from "../view/list-empty";
