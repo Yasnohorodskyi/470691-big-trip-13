@@ -9,16 +9,30 @@ import Smart from "./smart";
 
 const DAYJS_DATE_FORMAT = `DD/MM/YY HH:mm`;
 
-const createEventFormTemplate = (event = {}, isNewEvent = false) => {
-  const {type = EVENT_TYPES[0], destinationName = ``, price = ``, offers = [], destinationInfo} = event;
+const createEventFormTemplate = (event = {}, allDestinations = [], isNewEvent = false) => {
+  const {
+    type = EVENT_TYPES[0],
+    destinationName = ``,
+    price = ``,
+    offers = [],
+    destinationInfo,
+    isDisabled,
+    isSaving,
+    isDeleting
+  } = event;
 
   const typesFragment = EVENT_TYPES.map((eventType) => (`
     <div class="event__type-item">
-      <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${eventType === type ? `checked=""` : ``}>
+      <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${eventType === type ? `checked=""` : ``} ${isDisabled ? `disabled` : ``}>
       <label class="event__type-label  event__type-label--${eventType.toLowerCase()}" for="event-type-${eventType}-1">${eventType}</label>
     </div>
   `)).join(``);
 
+  const destinationOptions = allDestinations.map((destination) => (`
+    <option value="${destination.name}"></option>
+  `)).join(``);
+
+  const deleteButtonLabel = isDeleting ? `Deleting...` : `Delete`;
 
   return (
     `<li class="trip-events__item">
@@ -29,7 +43,7 @@ const createEventFormTemplate = (event = {}, isNewEvent = false) => {
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? `disabled` : ``}>
 
             <div class="event__type-list">
               <fieldset class="event__type-group">
@@ -43,20 +57,18 @@ const createEventFormTemplate = (event = {}, isNewEvent = false) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationName}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationName}" list="destination-list-1" ${isDisabled ? `disabled` : ``}>
             <datalist id="destination-list-1">
-              <option value="Amsterdam"></option>
-              <option value="Geneva"></option>
-              <option value="Chamonix"></option>
+              ${destinationOptions}
             </datalist>
           </div>
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="" ${isDisabled ? `disabled` : ``}>
             —
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="" ${isDisabled ? `disabled` : ``}>
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -64,17 +76,17 @@ const createEventFormTemplate = (event = {}, isNewEvent = false) => {
               <span class="visually-hidden">Price</span>
               €
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" min="1">
+            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" min="1" ${isDisabled ? `disabled` : ``}>
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">${isNewEvent ? `Cancel` : `Delete`}</button>
-          ${isNewEvent ? `` : `<button class="event__rollup-btn" type="button">
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>${isSaving ? `Saving...` : `Save`}</button>
+          <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>${isNewEvent ? `Cancel` : deleteButtonLabel}</button>
+          ${isNewEvent ? `` : `<button class="event__rollup-btn" type="button" ${isDisabled ? `disabled` : ``}>
             <span class="visually-hidden">Open event</span>
           </button>`}
         </header>
         ${offers.length > 0 || destinationInfo ? `<section class="event__details">
-          ${createOffersTemplate(offers)}
+          ${createOffersTemplate(offers, isDisabled)}
 
           ${createDestinationTemplate(destinationInfo)}
         </section>` : ``}
@@ -97,15 +109,15 @@ const createDestinationTemplate = (destinationInfo) => {
   );
 };
 
-const createOffersTemplate = (offers) => {
+const createOffersTemplate = (offers, isDisabled) => {
   if (offers.length === 0) {
     return ``;
   }
 
   const offersFragment = offers.map((offer) => (`
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${offer.isSelected ? `checked=""` : ``}>
-      <label class="event__offer-label" for="event-offer-${offer.type}-1">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.name}-1" type="checkbox" name="event-offer-${offer.name}" ${offer.isSelected ? `checked=""` : ``} ${isDisabled ? `disabled` : ``}>
+      <label class="event__offer-label" for="event-offer-${offer.name}-1">
         <span class="event__offer-title">${offer.name}</span>
         +€&nbsp;
         <span class="event__offer-price">${offer.price}</span>
@@ -143,11 +155,12 @@ const createPhotosTemplate = (photos) => {
 };
 
 export default class EventForm extends Smart {
-  constructor(event, isNew = false) {
+  constructor(event, allDestinations, isNew = false) {
     super();
     this._isEventCreationForm = isNew;
     this._data = EventForm.parseEventToData(event);
     this._startDatePicker = null;
+    this._allDestinations = allDestinations;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
@@ -168,7 +181,7 @@ export default class EventForm extends Smart {
   }
 
   getTemplate() {
-    return createEventFormTemplate(this._data, this._isEventCreationForm);
+    return createEventFormTemplate(this._data, this._allDestinations, this._isEventCreationForm);
   }
 
   removeElement() {
@@ -182,6 +195,13 @@ export default class EventForm extends Smart {
     }
   }
 
+  _getSelectedOffers() {
+    return this._data.offers.map((offer) => {
+      const offerIsSelected = this.getElement().querySelector(`[name="event-offer-${offer.name}"]`).checked;
+      return Object.assign({}, offer, {isSelected: offerIsSelected});
+    });
+  }
+
   _closeFormHandler(evt) {
     evt.preventDefault();
     this._callback.closeClick();
@@ -193,17 +213,13 @@ export default class EventForm extends Smart {
     const startDate = dayjs(startDateUnformatted, DAYJS_DATE_FORMAT).format();
     const endDateUnformatted = this.getElement().querySelector(`[name="event-end-time"]`).value;
     const endDate = dayjs(endDateUnformatted, DAYJS_DATE_FORMAT).format();
-    const offers = this._data.offers ? this._data.offers.map((offer) => {
-      const offerIsSelected = this.getElement().querySelector(`[name="event-offer-${offer.type}"]`).checked;
-      return Object.assign({}, offer, {isSelected: offerIsSelected});
-    }) : [];
 
     const newData = {
       price: +this.getElement().querySelector(`.event__input--price`).value,
       destinationName: this.getElement().querySelector(`.event__input--destination`).value,
       startDate,
       endDate,
-      offers,
+      offers: this._getSelectedOffers(),
     };
 
     if (this._isEventCreationForm) {
@@ -220,10 +236,6 @@ export default class EventForm extends Smart {
   }
 
   _setInnerHandlers() {
-    this.getElement().querySelectorAll(`[name="event-type"]`).forEach((typeButtonElement) => {
-      typeButtonElement.addEventListener(`change`, this._eventTypeHandler);
-    });
-
     this.getElement().querySelector(`.event__input--destination`).addEventListener(`input`, this._destinationNameChangeHandler);
     this.getElement().querySelector(`.event__input--price`).addEventListener(`input`, this._priceChangeHandler);
   }
@@ -283,9 +295,12 @@ export default class EventForm extends Smart {
   }
 
   _eventTypeHandler(evt) {
+    const type = evt.target.value;
+
     this.updateData({
       type: evt.target.value,
     }, false);
+    this._callback.changeType(type);
   }
 
   _formDeleteClickHandler(evt) {
@@ -294,17 +309,38 @@ export default class EventForm extends Smart {
   }
 
   _destinationNameChangeHandler(evt) {
-    const isDestinationNameValid = evt.target.value !== ``;
+    const destinationInfo = this._allDestinations.find((destination) => destination.name === evt.target.value);
+    const isDestinationNameValid = evt.target.value !== `` && destinationInfo;
     const price = this.getElement().querySelector(`.event__input--price`).value;
     const isPriceValid = +price > 0;
+
+    if (isDestinationNameValid) {
+      this.updateData({
+        destinationInfo: {
+          description: destinationInfo.description,
+          photos: destinationInfo.pictures,
+        },
+        destinationName: destinationInfo.name,
+        offers: this._getSelectedOffers(),
+      }, false);
+    }
+
     this._disableSaveButton(!isDestinationNameValid || !isPriceValid);
   }
 
   _priceChangeHandler(evt) {
-    const isPriceValid = +evt.target.value > 0;
+    const price = +evt.target.value;
+    const isPriceValid = price > 0;
     const destinationName = this.getElement().querySelector(`.event__input--destination`).value;
     const isDestinationNameValid = destinationName !== ``;
+
     this._disableSaveButton(!isPriceValid || !isDestinationNameValid);
+
+    if (isPriceValid) {
+      this.updateData({
+        price
+      });
+    }
   }
 
   _disableSaveButton(isDisabled) {
@@ -324,8 +360,11 @@ export default class EventForm extends Smart {
     this._setStartDatePicker();
     this._setEndDatePicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setCloseFormHandler(this._callback.closeClick);
     this.setDeleteClickHandler(this._callback.deleteClick);
+    this.setTypeChangeHandler(this._callback.changeType);
+    if (!this._isEventCreationForm) {
+      this.setCloseFormHandler(this._callback.closeClick);
+    }
   }
 
   setFormSubmitHandler(callback) {
@@ -343,11 +382,28 @@ export default class EventForm extends Smart {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
+  setTypeChangeHandler(callback) {
+    this._callback.changeType = callback;
+    this.getElement().querySelectorAll(`[name="event-type"]`).forEach((typeButtonElement) => {
+      typeButtonElement.addEventListener(`change`, this._eventTypeHandler);
+    });
+  }
+
   static parseEventToData(event) {
-    return Object.assign({}, event);
+    return Object.assign({}, event, {
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false
+    });
   }
 
   static parseDataToEvent(data) {
-    return Object.assign({}, data);
+    data = Object.assign({}, data);
+
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
+
+    return data;
   }
 }

@@ -11,11 +11,19 @@ const Mode = {
   EDITING: `EDITING`
 };
 
+export const State = {
+  SAVING: `SAVING`,
+  DELETING: `DELETING`,
+  ABORTING: `ABORTING`
+};
+
 export default class EventPresenter {
-  constructor(eventListContainer, changeData, changeMode) {
+  constructor(eventListContainer, changeData, changeMode, offersModel, destinationsModel) {
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
 
     this._eventComponent = null;
     this._eventFormComponent = null;
@@ -27,6 +35,7 @@ export default class EventPresenter {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
+    this._handleTypeChange = this._handleTypeChange.bind(this);
   }
 
   init(event) {
@@ -35,13 +44,14 @@ export default class EventPresenter {
 
     this._event = event;
     this._eventComponent = new EventView(event);
-    this._eventFormComponent = new EventFormView(event);
+    this._eventFormComponent = new EventFormView(event, this._destinationsModel.getDestinations());
 
     this._eventComponent.setEditClickHandler(this._handleEditClick);
     this._eventFormComponent.setCloseFormHandler(this._handleCloseForm);
     this._eventFormComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._eventComponent.setFavoriteClick(this._handleFavoriteClick);
     this._eventFormComponent.setDeleteClickHandler(this._handleDeleteClick);
+    this._eventFormComponent.setTypeChangeHandler(this._handleTypeChange);
 
     if (prevEventComponent === null || prevFormComponent === null) {
       render(this._eventListContainer, this._eventComponent);
@@ -53,11 +63,43 @@ export default class EventPresenter {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._eventListContainer, this._eventFormComponent, prevFormComponent);
+      // console.log(this._eventListContainer, this._eventComponent, prevEventComponent);
+      // replace(this._eventListContainer, this._eventFormComponent, prevFormComponent);
+      replace(this._eventListContainer, this._eventComponent, prevFormComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(prevEventComponent);
     remove(prevFormComponent);
+  }
+
+  setViewState(state) {
+    const resetFormState = () => {
+      this._eventFormComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      }, false);
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._eventFormComponent.updateData({
+          isDisabled: true,
+          isSaving: true
+        }, false);
+        break;
+      case State.DELETING:
+        this._eventFormComponent.updateData({
+          isDisabled: true,
+          isDeleting: true
+        }, false);
+        break;
+      case State.ABORTING:
+        this._eventComponent.shake(resetFormState);
+        this._eventFormComponent.shake(resetFormState);
+        break;
+    }
   }
 
   destroy() {
@@ -101,13 +143,19 @@ export default class EventPresenter {
       !isDatesEqual(this._event.endDate, newData.endDate) ||
       this._event.price !== newData.price;
 
-    this._replaceFormToEvent();
+    // this._replaceFormToEvent();
 
     this._changeData(UserAction.UPDATE_EVENT, isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH, newData);
   }
 
   _handleDeleteClick(event) {
     this._changeData(UserAction.DELETE_EVENT, UpdateType.MINOR, event);
+  }
+
+  _handleTypeChange(type) {
+    this._eventFormComponent.reset({
+      offers: this._offersModel.getOffersByType(type)
+    });
   }
 
   _onEscKeyDown(evt) {

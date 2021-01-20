@@ -1,5 +1,6 @@
 
 import Observer from "../utils/observer";
+import Offers from "./offers";
 
 export default class Events extends Observer {
   constructor() {
@@ -55,14 +56,7 @@ export default class Events extends Observer {
   }
 
   static adaptToClient(event) {
-    const offers = event.offers.map((offer) => {
-      return {
-        type: offer.title, // TODO: check if the field is needed
-        name: offer.title,
-        price: offer.price,
-        isSelected: false
-      };
-    });
+    const offers = event.offers.map((offer) => Object.assign({}, Offers.adaptToClient(offer), {isSelected: true}));
 
     const adaptedEvent = Object.assign({}, {
       id: event.id,
@@ -82,13 +76,8 @@ export default class Events extends Observer {
     return adaptedEvent;
   }
 
-  static adaptToServer(event) {
-    const offers = event.offers.map((offer) => {
-      return {
-        "title": offer.name,
-        "price": offer.price
-      };
-    });
+  static adaptToServer(event, isNew = false) {
+    const offers = event.offers.filter((offer) => offer.isSelected).map(Offers.adaptToServer);
 
     const adaptedEvent = Object.assign({}, {
       "base_price": event.price,
@@ -102,8 +91,13 @@ export default class Events extends Observer {
       "id": event.id,
       "is_favorite": event.isFavorite,
       offers,
-      "type": event.type
+      "type": event.type.toLowerCase()
     });
+
+    if (isNew) {
+      adaptedEvent[`is_favorite`] = false;
+      delete adaptedEvent.id;
+    }
 
     return adaptedEvent;
   }
