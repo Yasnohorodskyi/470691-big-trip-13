@@ -345,7 +345,7 @@ export default class EventForm extends Smart {
   }
 
   _destinationNameChangeHandler(evt) {
-    const destinationInfo = this._allDestinations.find((destination) => destination.name === evt.target.value);
+    const destinationInfo = this._getDestinationInfo(evt.target.value);
     const isDestinationNameValid = evt.target.value !== `` && destinationInfo;
     const price = this.getElement().querySelector(`.event__input--price`).value;
     const isPriceValid = +price > 0;
@@ -368,7 +368,8 @@ export default class EventForm extends Smart {
     const price = +evt.target.value;
     const isPriceValid = price > 0;
     const destinationName = this.getElement().querySelector(`.event__input--destination`).value;
-    const isDestinationNameValid = destinationName !== ``;
+    const destinationInfo = this._getDestinationInfo(destinationName);
+    const isDestinationNameValid = destinationName !== `` && destinationInfo;
 
     this._disableSaveButton(!isPriceValid || !isDestinationNameValid);
 
@@ -377,6 +378,10 @@ export default class EventForm extends Smart {
         price
       });
     }
+  }
+
+  _getDestinationInfo(name) {
+    return this._allDestinations.find((destination) => destination.name === name);
   }
 
   _disableSaveButton(isDisabled) {
