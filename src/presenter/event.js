@@ -2,9 +2,8 @@ import EventView from '../view/event';
 import EventFormView from '../view/event-form';
 import {render, replace, remove} from "../utils/render";
 import {isEscPressed} from '../utils/button-codes';
-import {UserAction} from "../utils/user-action";
-import {UpdateType} from "../utils/update-type";
 import {isDatesEqual} from '../utils/date';
+import {UpdateType, UserAction} from '../const';
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -63,8 +62,6 @@ export default class EventPresenter {
     }
 
     if (this._mode === Mode.EDITING) {
-      // console.log(this._eventListContainer, this._eventComponent, prevEventComponent);
-      // replace(this._eventListContainer, this._eventFormComponent, prevFormComponent);
       replace(this._eventListContainer, this._eventComponent, prevFormComponent);
       this._mode = Mode.DEFAULT;
     }
@@ -142,8 +139,6 @@ export default class EventPresenter {
       !isDatesEqual(this._event.startDate, newData.startDate) ||
       !isDatesEqual(this._event.endDate, newData.endDate) ||
       this._event.price !== newData.price;
-
-    // this._replaceFormToEvent();
 
     this._changeData(UserAction.UPDATE_EVENT, isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH, newData);
   }

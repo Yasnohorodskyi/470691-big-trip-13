@@ -5,7 +5,6 @@ const createErrorMessageTemplate = () => {
 };
 
 export default class ErrorMessageView extends AbstractView {
-
   getTemplate() {
     return createErrorMessageTemplate();
   }

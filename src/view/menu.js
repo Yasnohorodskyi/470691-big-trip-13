@@ -1,4 +1,4 @@
-import {MenuItem} from "../utils/menu-item";
+import {MenuItem} from "../const";
 import AbstractView from "./abstract";
 
 const createSiteMenuTemplate = () => {
@@ -21,17 +21,6 @@ export default class SiteMenu extends AbstractView {
     return createSiteMenuTemplate();
   }
 
-  _menuClickHandler(evt) {
-    evt.preventDefault();
-
-    const isCurrentItemActive = evt.target.classList.contains(`trip-tabs__btn--active`);
-
-    if (evt.target.nodeName === `A` && !isCurrentItemActive) {
-      this._callback.menuClick(evt.target.id);
-      this.setMenuItem(evt.target.id);
-    }
-  }
-
   setMenuClickHandler(callback) {
     this._callback.menuClick = callback;
     this.getElement().addEventListener(`click`, this._menuClickHandler);
@@ -43,5 +32,16 @@ export default class SiteMenu extends AbstractView {
 
     const inactiveItemId = menuItemId === MenuItem.STATISTICS ? MenuItem.TABLE : MenuItem.STATISTICS;
     this.getElement().querySelector(`#${inactiveItemId}`).classList.remove(`trip-tabs__btn--active`);
+  }
+
+  _menuClickHandler(evt) {
+    evt.preventDefault();
+
+    const isCurrentItemActive = evt.target.classList.contains(`trip-tabs__btn--active`);
+
+    if (evt.target.nodeName === `A` && !isCurrentItemActive) {
+      this._callback.menuClick(evt.target.id);
+      this.setMenuItem(evt.target.id);
+    }
   }
 }
