@@ -283,14 +283,14 @@ export default class EventForm extends Smart {
     }
 
     const config = {
-      dateFormat: `d/m/y H:i`,
-      defaultDate: dayjs(this._data.startDate).toDate(),
-      defaultHour: dayjs(this._data.startDate).hour(),
-      defaultMinute: dayjs(this._data.startDate).minute(),
-      enableTime: true,
-      time_24hr: true, // eslint-disable-line camelcase
-      maxDate: dayjs(this._data.endDate).toDate(),
-      onChange: this._startDateChangeHandler
+      "dateFormat": `d/m/y H:i`,
+      "defaultDate": dayjs(this._data.startDate).toDate(),
+      "defaultHour": dayjs(this._data.startDate).hour(),
+      "defaultMinute": dayjs(this._data.startDate).minute(),
+      "enableTime": true,
+      "time_24hr": true,
+      "maxDate": dayjs(this._data.endDate).toDate(),
+      "onChange": this._startDateChangeHandler
     };
 
     this._startDatePicker = flatpickr(this.getElement().querySelector(`[name="event-start-time"]`), config);
@@ -310,14 +310,14 @@ export default class EventForm extends Smart {
     }
 
     const config = {
-      dateFormat: `d/m/y H:i`,
-      defaultDate: dayjs(this._data.endDate).toDate(),
-      defaultHour: dayjs(this._data.endDate).hour(),
-      defaultMinute: dayjs(this._data.endDate).minute(),
-      enableTime: true,
-      time_24hr: true, // eslint-disable-line camelcase
-      minDate: dayjs(this._data.startDate).toDate(),
-      onChange: this._endDateChangeHandler
+      "dateFormat": `d/m/y H:i`,
+      "defaultDate": dayjs(this._data.endDate).toDate(),
+      "defaultHour": dayjs(this._data.endDate).hour(),
+      "defaultMinute": dayjs(this._data.endDate).minute(),
+      "enableTime": true,
+      "time_24hr": true,
+      "minDate": dayjs(this._data.startDate).toDate(),
+      "onChange": this._endDateChangeHandler
     };
 
     this._endDatePicker = flatpickr(this.getElement().querySelector(`[name="event-end-time"]`), config);
