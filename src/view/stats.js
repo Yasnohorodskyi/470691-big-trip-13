@@ -135,7 +135,7 @@ const renderTimeStats = (timeCtx, statsData) => {
   });
 };
 
-export default class Statistics extends SmartView {
+export default class Stats extends SmartView {
   constructor(events) {
     super();
 

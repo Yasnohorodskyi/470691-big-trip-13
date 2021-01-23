@@ -1,6 +1,6 @@
 import TripSortView from "../view/trip-sort";
-import EventListView from "../view/list.js";
-import EmptyListView from "../view/list-empty";
+import EventListView from "../view/event-list";
+import EmptyListView from "../view/empty-list";
 import {remove, render, RenderPosition} from "../utils/render";
 import EventPresenter, {State as EventPresenterViewState} from "./event";
 import EventNewPresenter from "./event-new";
@@ -12,7 +12,7 @@ import {EVENT_TYPES} from "../utils/event-types";
 import ErrorMessageView from "../view/error-message";
 import {SortType, UpdateType, UserAction} from "../const";
 
-export default class TripPresenter {
+export default class Trip {
   constructor(mainTripContainer, tripEventsContainer, eventsModel, filterModel, offersModel, destinationsModel, api) {
     this._mainTripContainer = mainTripContainer;
     this._tripEventsContainer = tripEventsContainer;

@@ -10,7 +10,7 @@ const createSiteMenuTemplate = () => {
   );
 };
 
-export default class SiteMenu extends AbstractView {
+export default class Menu extends AbstractView {
   constructor() {
     super();
 
