@@ -1,9 +1,9 @@
-import EventView from '../view/event';
-import EventFormView from '../view/event-form';
+import EventView from "../view/event";
+import EventFormView from "../view/event-form";
 import {render, replace, remove} from "../utils/render";
-import {isEscPressed} from '../utils/button-codes';
-import {isDatesEqual} from '../utils/date';
-import {UpdateType, UserAction} from '../const';
+import {isEscPressed} from "../utils/button-codes";
+import {isDatesEqual} from "../utils/date";
+import {UpdateType, UserAction} from "../const";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -16,7 +16,7 @@ export const State = {
   ABORTING: `ABORTING`
 };
 
-export default class EventPresenter {
+export default class Event {
   constructor(eventListContainer, changeData, changeMode, offersModel, destinationsModel) {
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
@@ -28,7 +28,7 @@ export default class EventPresenter {
     this._eventFormComponent = null;
     this._mode = Mode.DEFAULT;
 
-    this._onEscKeyDown = this._onEscKeyDown.bind(this);
+    this._handleEscKeyDown = this._handleEscKeyDown.bind(this);
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleCloseForm = this._handleCloseForm.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
@@ -100,7 +100,7 @@ export default class EventPresenter {
   }
 
   destroy() {
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
+    document.removeEventListener(`keydown`, this._handleEscKeyDown);
     remove(this._eventComponent);
     remove(this._eventFormComponent);
   }
@@ -114,7 +114,7 @@ export default class EventPresenter {
 
   _replaceEventToForm() {
     replace(this._eventListContainer, this._eventFormComponent, this._eventComponent);
-    document.addEventListener(`keydown`, this._onEscKeyDown);
+    document.addEventListener(`keydown`, this._handleEscKeyDown);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
@@ -122,7 +122,7 @@ export default class EventPresenter {
   _replaceFormToEvent() {
     replace(this._eventListContainer, this._eventComponent, this._eventFormComponent);
 
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
+    document.removeEventListener(`keydown`, this._handleEscKeyDown);
     this._mode = Mode.DEFAULT;
   }
 
@@ -154,7 +154,7 @@ export default class EventPresenter {
     });
   }
 
-  _onEscKeyDown(evt) {
+  _handleEscKeyDown(evt) {
     if (isEscPressed(evt)) {
       evt.preventDefault();
       this._eventFormComponent.reset(this._event);
